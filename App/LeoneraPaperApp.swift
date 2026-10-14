@@ -6,6 +6,7 @@ struct LeoneraPaperApp: App {
     @State private var drive: DriveSync
     @State private var dictionary = DictionaryService()
     @State private var preferences = ReaderPreferences()
+    @State private var blogs = BlogStore()
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
@@ -18,11 +19,12 @@ struct LeoneraPaperApp: App {
 
     var body: some Scene {
         WindowGroup {
-            LibraryView()
+            RootView()
                 .environment(library)
                 .environment(drive)
                 .environment(dictionary)
                 .environment(preferences)
+                .environment(blogs)
                 .onOpenURL { url in
                     library.handleIncoming(url)
                 }
