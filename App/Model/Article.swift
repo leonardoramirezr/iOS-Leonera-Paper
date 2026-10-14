@@ -3,7 +3,8 @@ import Foundation
 struct Article: Identifiable, Codable, Hashable {
     var id: UUID
     var title: String
-    var sourceURL: URL
+    /// Página de origen. Es nil en los PDF importados desde Archivos.
+    var sourceURL: URL?
     var siteName: String?
     var author: String?
     var excerpt: String?
@@ -17,10 +18,15 @@ struct Article: Identifiable, Codable, Hashable {
     var leadImage: String?
     var readingProgress: Double?
     var drive: DriveInfo?
+    /// PDF original (dentro de la carpeta) si el artículo se convirtió desde un PDF.
+    var pdfFileName: String? = nil
 
     var displaySite: String {
         if let siteName, !siteName.isEmpty { return siteName }
-        return sourceURL.host?.replacingOccurrences(of: "www.", with: "") ?? sourceURL.absoluteString
+        if let sourceURL {
+            return sourceURL.host?.replacingOccurrences(of: "www.", with: "") ?? sourceURL.absoluteString
+        }
+        return pdfFileName != nil ? "PDF" : "Documento"
     }
 }
 
@@ -49,6 +55,10 @@ struct ArticleStorage {
 
     func markdownURL(for article: Article) -> URL {
         folderURL(for: article).appendingPathComponent(article.fileName)
+    }
+
+    func pdfURL(for article: Article) -> URL? {
+        article.pdfFileName.map { folderURL(for: article).appendingPathComponent($0) }
     }
 
     func imagesURL(inFolder folder: URL) -> URL {
@@ -84,6 +94,48 @@ struct ArticleStorage {
         let url = documents.appendingPathComponent(name, isDirectory: true)
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
         return (name, url)
+    }
+
+    /// Carpeta temporal donde se copian los PDF recibidos hasta que se importan.
+    static var pdfStagingDirectory: URL {
+        FileManager.default.temporaryDirectory.appendingPathComponent("PDFImports", isDirectory: true)
+    }
+
+    /// Copia un PDF recibido (Archivos, «Abrir en…», selector de documentos) a una
+    /// carpeta temporal propia: el original puede dejar de ser accesible.
+    static func stagePDF(from url: URL) throws -> URL {
+        let accessing = url.startAccessingSecurityScopedResource()
+        defer { if accessing { url.stopAccessingSecurityScopedResource() } }
+
+        let folder = pdfStagingDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        var name = url.lastPathComponent
+        if !name.lowercased().hasSuffix(".pdf") { name += ".pdf" }
+        let destination = folder.appendingPathComponent(name)
+
+        // El coordinador descarga antes el archivo si está en iCloud y aún no se ha bajado.
+        var coordinationError: NSError?
+        var copyError: Error?
+        NSFileCoordinator().coordinate(readingItemAt: url, options: .withoutChanges, error: &coordinationError) { readable in
+            do {
+                try FileManager.default.copyItem(at: readable, to: destination)
+            } catch {
+                copyError = error
+            }
+        }
+        if let error = coordinationError ?? copyError {
+            try? FileManager.default.removeItem(at: folder)
+            throw error
+        }
+        guard PDFImporter.isPDF(destination) else {
+            try? FileManager.default.removeItem(at: folder)
+            throw PDFConversionError.unreadable
+        }
+        // «Abrir en…» deja una copia en Documentos/Inbox, visible en Archivos.
+        if url.standardizedFileURL.path.contains("/Documents/Inbox/") {
+            try? FileManager.default.removeItem(at: url)
+        }
+        return destination
     }
 
     static func slug(_ title: String) -> String {

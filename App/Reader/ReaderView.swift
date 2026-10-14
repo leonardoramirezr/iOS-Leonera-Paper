@@ -1,3 +1,4 @@
+import QuickLook
 import SwiftUI
 
 struct ReaderView: View {
@@ -9,6 +10,7 @@ struct ReaderView: View {
 
     @State private var model: ReaderModel
     @State private var showsSettings = false
+    @State private var previewURL: URL?
 
     init(article: Article, library: Library) {
         _model = State(initialValue: ReaderModel(article: article, library: library))
@@ -61,10 +63,19 @@ struct ReaderView: View {
                     ShareLink(item: model.markdownURL) {
                         Label("Compartir Markdown", systemImage: "square.and.arrow.up")
                     }
-                    Button {
-                        openURL(model.article.sourceURL)
-                    } label: {
-                        Label("Abrir original", systemImage: "safari")
+                    if let source = model.article.sourceURL {
+                        Button {
+                            openURL(source)
+                        } label: {
+                            Label("Abrir original", systemImage: "safari")
+                        }
+                    }
+                    if let pdf = library.pdfURL(for: model.article) {
+                        Button {
+                            previewURL = pdf
+                        } label: {
+                            Label("Ver PDF original", systemImage: "doc.richtext")
+                        }
                     }
                     if drive.isConnected {
                         Button {
@@ -82,6 +93,7 @@ struct ReaderView: View {
             }
         }
         .onDisappear { model.saveProgress() }
+        .quickLookPreview($previewURL)
     }
 
     private func layout(width: CGFloat) {

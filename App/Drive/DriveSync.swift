@@ -228,7 +228,7 @@ final class DriveSync {
 
     // MARK: - Subida
 
-    /// Sube el artículo (Markdown e imágenes) a `Leonera Paper/<carpeta>/`. Si ya se
+    /// Sube el artículo (Markdown, imágenes y PDF original) a `Leonera Paper/<carpeta>/`. Si ya se
     /// subió antes, solo actualiza el Markdown (p. ej. tras resaltar).
     func upload(article: Article, storage: ArticleStorage) async throws -> DriveInfo {
         activeUploads += 1
@@ -252,6 +252,9 @@ final class DriveSync {
                 let mime = UTType(filenameExtension: image.pathExtension)?.preferredMIMEType ?? "application/octet-stream"
                 _ = try await createFile(named: image.lastPathComponent, mimeType: mime, data: data, parent: imagesID)
             }
+        }
+        if let pdf = storage.pdfURL(for: article), let data = try? Data(contentsOf: pdf) {
+            _ = try await createFile(named: pdf.lastPathComponent, mimeType: "application/pdf", data: data, parent: folderID)
         }
         let fileID = try await createFile(named: article.fileName, mimeType: "text/markdown", data: markdown, parent: folderID)
         return DriveInfo(folderID: folderID, markdownFileID: fileID, uploadedAt: Date())

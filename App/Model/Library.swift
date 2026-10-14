@@ -7,9 +7,14 @@ import Observation
 final class Library {
     struct ImportJob: Identifiable, Equatable {
         let id = UUID()
+        /// Página web o copia local de un PDF.
         let url: URL
         var status: String
         var error: String?
+
+        var displayName: String {
+            url.isFileURL ? url.lastPathComponent : (url.host ?? url.absoluteString)
+        }
     }
 
     private(set) var articles: [Article] = []
@@ -37,13 +42,34 @@ final class Library {
         storage.folderURL(for: article)
     }
 
+    func pdfURL(for article: Article) -> URL? {
+        storage.pdfURL(for: article)
+    }
+
     // MARK: - Entrada de enlaces
 
     func handleIncoming(_ url: URL) {
-        if let target = AppLinks.articleURL(from: url) {
+        if url.isFileURL {
+            // PDF abierto desde Archivos, Mail, etc. («Abrir en Leonera Paper»).
+            importPDF(at: url)
+        } else if let target = AppLinks.articleURL(from: url) {
             importArticle(from: target)
         }
         drainSharedQueue()
+    }
+
+    /// Importa un PDF local: primero se copia a una carpeta temporal propia.
+    func importPDF(at url: URL) {
+        Task {
+            do {
+                let staged = try await Task.detached(priority: .userInitiated) {
+                    try ArticleStorage.stagePDF(from: url)
+                }.value
+                importArticle(from: staged)
+            } catch {
+                notice = "No se pudo abrir «\(url.lastPathComponent)»: \(error.localizedDescription)"
+            }
+        }
     }
 
     func drainSharedQueue() {
@@ -56,7 +82,7 @@ final class Library {
 
     func importArticle(from url: URL) {
         guard !jobs.contains(where: { $0.url == url && $0.error == nil }) else { return }
-        if let existing = articles.first(where: { $0.sourceURL == url }) {
+        if !url.isFileURL, let existing = articles.first(where: { $0.sourceURL == url }) {
             notice = "«\(existing.title)» ya está en tu biblioteca."
             return
         }
@@ -73,15 +99,24 @@ final class Library {
 
     func dismiss(_ job: ImportJob) {
         jobs.removeAll { $0.id == job.id }
+        removeStagedPDF(job.url)
     }
 
     private func runImport(jobID: UUID, url: URL) async {
+        let update: @MainActor (String) -> Void = { [weak self] status in
+            guard let self, let index = self.jobs.firstIndex(where: { $0.id == jobID }) else { return }
+            self.jobs[index].status = status
+        }
         do {
-            let article = try await ArticleImporter.importArticle(from: url, storage: storage) { [weak self] status in
-                guard let self, let index = self.jobs.firstIndex(where: { $0.id == jobID }) else { return }
-                self.jobs[index].status = status
+            let article: Article
+            if url.isFileURL {
+                article = try await PDFImporter.importPDF(at: url, sourceURL: nil, suggestedName: url.lastPathComponent,
+                                                          storage: storage, progress: update)
+            } else {
+                article = try await ArticleImporter.importArticle(from: url, storage: storage, progress: update)
             }
             jobs.removeAll { $0.id == jobID }
+            removeStagedPDF(url)
             articles.insert(article, at: 0)
             persist()
             notice = "Guardado: \(article.title)"
@@ -93,6 +128,15 @@ final class Library {
                 jobs[index].error = error.localizedDescription
             }
         }
+    }
+
+    /// Borra la copia temporal de un PDF (se conserva mientras se pueda reintentar).
+    private func removeStagedPDF(_ url: URL) {
+        guard url.isFileURL else { return }
+        let staging = ArticleStorage.pdfStagingDirectory.standardizedFileURL.path
+        let folder = url.deletingLastPathComponent().standardizedFileURL
+        guard folder.path.hasPrefix(staging + "/") else { return }
+        try? FileManager.default.removeItem(at: folder)
     }
 
     // MARK: - Cambios

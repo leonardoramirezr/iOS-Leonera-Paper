@@ -1,10 +1,12 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
-/// Añadir un artículo pegando su URL.
+/// Añadir un artículo pegando su URL o eligiendo un PDF.
 struct AddArticleView: View {
     @Environment(Library.self) private var library
     @Environment(\.dismiss) private var dismiss
     @State private var text = ""
+    @State private var showsPDFPicker = false
     @FocusState private var focused: Bool
 
     var body: some View {
@@ -25,6 +27,24 @@ struct AddArticleView: View {
                 } footer: {
                     Text("La página se convierte a Markdown con sus imágenes y se guarda en Archivos › En mi iPhone › Leonera Paper. También puedes compartirla desde Safari.")
                 }
+                Section {
+                    Button {
+                        focused = false
+                        showsPDFPicker = true
+                    } label: {
+                        Label("Elegir PDF…", systemImage: "doc.richtext")
+                    }
+                } footer: {
+                    Text("El PDF se convierte a Markdown y se guarda junto al original. También puedes abrir un PDF desde Archivos o Mail con «Leonera Paper», o pegar el enlace a un PDF.")
+                }
+            }
+            .fileImporter(isPresented: $showsPDFPicker, allowedContentTypes: [.pdf],
+                          allowsMultipleSelection: true) { result in
+                guard case .success(let urls) = result, !urls.isEmpty else { return }
+                for url in urls {
+                    library.importPDF(at: url)
+                }
+                dismiss()
             }
             .navigationTitle("Añadir artículo")
             .navigationBarTitleDisplayMode(.inline)
