@@ -22,6 +22,11 @@ como Markdown, leerlos con varios estilos, resaltarlos y consultar el diccionari
   el OCR de Vision (y, si no tienen texto, se guardan como imagen) y las imágenes
   incrustadas se extraen a `images/`. El PDF original se guarda junto al Markdown y
   se puede ver desde el menú del artículo (*Ver PDF original*).
+- **Blogs para descubrir artículos**: la pestaña *Blogs* (barra inferior, junto a
+  *Artículos*) guarda enlaces a la portada o el archivo de blogs, newsletters,
+  Medium, Substack… Al pegar la URL (botón **+** de esa pestaña) se obtienen el
+  título y el icono de la página, editables antes de guardar. Se muestran en una
+  lista con el icono a la izquierda y el título a la derecha; tocar uno lo abre.
 - **Almacenamiento local** en *Archivos › En mi iPhone › Leonera Paper*: una carpeta
   por artículo con `<artículo>.md` (con *front matter* YAML), `images/` y, si viene
   de un PDF, `<artículo>.pdf`.
