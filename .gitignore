@@ -1,0 +1,12 @@
+# Proyecto generado por XcodeGen (ver project.yml)
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+DerivedData/
+build/
+dist/
+*.xcarchive
+*.ipa
+*.p8
+.DS_Store
+__pycache__/
