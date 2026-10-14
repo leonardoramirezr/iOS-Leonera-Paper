@@ -77,7 +77,7 @@ enum ImageDownloader {
         if width < 48 || height < 48 { return .drop }
 
         var ext = "img"
-        if let type = CGImageSourceGetType(source) as String?, let utType = UTType(type) {
+        if let type = CGImageSourceGetType(source), let utType = UTType(type as String) {
             ext = utType.preferredFilenameExtension ?? ext
         }
         if ext == "jpeg" { ext = "jpg" }

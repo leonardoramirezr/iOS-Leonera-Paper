@@ -138,24 +138,45 @@ jobs:
         run: |
           set -o pipefail
           beautify() { if command -v xcbeautify >/dev/null 2>&1; then xcbeautify --renderer github-actions; else cat; fi; }
-          xcodebuild archive \
-            -project "$PROJECT" \
-            -scheme "$SCHEME" \
-            -configuration Release \
-            -destination 'generic/platform=iOS' \
-            -archivePath "$RUNNER_TEMP/LeoneraPaper.xcarchive" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$ASC_KEY_PATH" \
-            -authenticationKeyID "$ASC_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
-            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
-            CODE_SIGN_STYLE=Automatic \
-            APP_BUNDLE_ID="$APP_BUNDLE_ID" \
-            SHARE_EXTENSION_BUNDLE_ID="$SHARE_EXTENSION_BUNDLE_ID" \
-            MARKETING_VERSION="$VERSION" \
-            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-            GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID" \
-            2>&1 | tee "$RUNNER_TEMP/xcodebuild-archive.log" | beautify
+          # Xcode 16+ guarda los perfiles en UserData; se enlaza también la ruta clásica.
+          profiles="$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
+          legacy="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$profiles"
+          if [ ! -e "$legacy" ]; then
+            mkdir -p "$(dirname "$legacy")"
+            ln -s "$profiles" "$legacy"
+          fi
+          log="$RUNNER_TEMP/xcodebuild-archive.log"
+          archive() {
+            xcodebuild archive \
+              -project "$PROJECT" \
+              -scheme "$SCHEME" \
+              -configuration Release \
+              -destination 'generic/platform=iOS' \
+              -archivePath "$RUNNER_TEMP/LeoneraPaper.xcarchive" \
+              -allowProvisioningUpdates \
+              -authenticationKeyPath "$ASC_KEY_PATH" \
+              -authenticationKeyID "$ASC_KEY_ID" \
+              -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+              DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+              CODE_SIGN_STYLE=Automatic \
+              APP_BUNDLE_ID="$APP_BUNDLE_ID" \
+              SHARE_EXTENSION_BUNDLE_ID="$SHARE_EXTENSION_BUNDLE_ID" \
+              MARKETING_VERSION="$VERSION" \
+              CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+              GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID" \
+              2>&1 | tee -a "$log" | beautify
+          }
+          if archive; then exit 0; fi
+          # La primera vez que Xcode crea un perfil, el build puede buscarlo antes de que
+          # esté en disco ("Build input file cannot be found: …mobileprovision"). Con el
+          # perfil ya descargado, un segundo intento funciona.
+          if grep -q "cannot be found: .*\.mobileprovision" "$log"; then
+            echo "::notice title=Perfiles::Xcode acaba de crear los perfiles; se repite el archive."
+            archive
+          else
+            exit 1
+          fi
 
       - name: Exportar el IPA Ad Hoc
         if: steps.secrets.outputs.signed == 'true'

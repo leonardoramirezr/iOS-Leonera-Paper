@@ -219,7 +219,9 @@ private struct SenseView: View {
                         .foregroundStyle(Color(theme.secondary))
                 }
                 ForEach(Array(sense.subsenses.enumerated()), id: \.element.id) { index, subsense in
-                    SenseView(number: "\(number).\(index + 1)", sense: subsense, isTranslation: isTranslation, theme: theme)
+                    // AnyView: una vista recursiva no puede tener un tipo opaco definido en función de sí misma.
+                    AnyView(SenseView(number: "\(number).\(index + 1)", sense: subsense,
+                                      isTranslation: isTranslation, theme: theme))
                 }
             }
         }
