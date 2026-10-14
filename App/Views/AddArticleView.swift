@@ -1,0 +1,58 @@
+import SwiftUI
+
+/// Añadir un artículo pegando su URL.
+struct AddArticleView: View {
+    @Environment(Library.self) private var library
+    @Environment(\.dismiss) private var dismiss
+    @State private var text = ""
+    @FocusState private var focused: Bool
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextField("https://…", text: $text, axis: .vertical)
+                        .keyboardType(.URL)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .focused($focused)
+                        .onSubmit(save)
+                    PasteButton(payloadType: URL.self) { urls in
+                        if let url = urls.first {
+                            text = url.absoluteString
+                        }
+                    }
+                } footer: {
+                    Text("La página se convierte a Markdown con sus imágenes y se guarda en Archivos › En mi iPhone › Leonera Paper. También puedes compartirla desde Safari.")
+                }
+            }
+            .navigationTitle("Añadir artículo")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancelar") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Guardar", action: save)
+                        .disabled(url == nil)
+                }
+            }
+            .onAppear { focused = true }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private var url: URL? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let candidate = trimmed.contains("://") ? trimmed : "https://\(trimmed)"
+        guard let url = URL(string: candidate), let scheme = url.scheme?.lowercased(),
+              scheme == "http" || scheme == "https", let host = url.host, host.contains(".") else { return nil }
+        return url
+    }
+
+    private func save() {
+        guard let url else { return }
+        library.importArticle(from: url)
+        dismiss()
+    }
+}

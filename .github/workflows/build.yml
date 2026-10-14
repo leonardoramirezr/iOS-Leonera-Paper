@@ -1,0 +1,374 @@
+name: Build
+
+# Cada push compila la app, la firma Ad Hoc y publica el IPA en GitHub Pages para
+# instalarlo desde Safari. En main se etiqueta 0.x.0 (release estable, Latest); en
+# el resto de ramas build-<run>-<sha7> (pre-release).
+
+on:
+  push:
+    branches: ['**', '!gh-pages']
+  workflow_dispatch:
+
+# Ningún build se cancela: en main se encolan (para numerar las versiones en orden);
+# en otras ramas cada ejecución tiene su propio grupo.
+concurrency:
+  group: ${{ github.ref == 'refs/heads/main' && 'main' || github.run_id }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: read
+
+env:
+  APP_NAME: Leonera Paper
+  PROJECT: LeoneraPaper.xcodeproj
+  SCHEME: LeoneraPaper
+  APP_BUNDLE_ID: com.leonardoramirezr.leonerapaper
+  SHARE_EXTENSION_BUNDLE_ID: com.leonardoramirezr.leonerapaper.share
+  IPA_NAME: LeoneraPaper.ipa
+
+jobs:
+  build:
+    name: Compilar, firmar y publicar
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Comprobar secrets
+        id: secrets
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          missing=""
+          present=0
+          for name in ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8 APPLE_TEAM_ID; do
+            if [ -n "$(printenv "$name")" ]; then
+              present=$((present + 1))
+            else
+              missing="$missing $name"
+            fi
+          done
+          if [ "$present" -eq 4 ]; then
+            echo "Secrets de firma presentes: se generará un IPA Ad Hoc firmado."
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          elif [ "$present" -eq 0 ]; then
+            echo "::warning title=Sin firma::No hay secrets de firma; se generará un IPA sin firmar (no instalable) y no se publicará."
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error title=Secrets incompletos::Faltan secrets de firma:${missing}. Configura los cuatro (ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8, APPLE_TEAM_ID) o ninguno."
+            exit 1
+          fi
+
+      - name: Calcular versión y etiqueta
+        id: version
+        run: |
+          set -euo pipefail
+          git fetch --tags --force --quiet
+          last_minor=$(git tag --list '0.*.0' | sed -nE 's/^0\.([0-9]+)\.0$/\1/p' | sort -n | tail -n 1)
+          last_minor=${last_minor:-0}
+          if [ "$GITHUB_REF" = "refs/heads/main" ]; then
+            tag="0.$((last_minor + 1)).0"
+            version="$tag"
+            channel=stable
+          else
+            tag="build-${GITHUB_RUN_NUMBER}-${GITHUB_SHA:0:7}"
+            version="0.${last_minor}.${GITHUB_RUN_NUMBER}"
+            channel=prerelease
+          fi
+          {
+            echo "tag=$tag"
+            echo "version=$version"
+            echo "build=$GITHUB_RUN_NUMBER"
+            echo "channel=$channel"
+          } >> "$GITHUB_OUTPUT"
+          echo "Etiqueta: $tag · versión $version ($GITHUB_RUN_NUMBER) · canal $channel"
+
+      - name: Generar el proyecto con XcodeGen
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          if ! command -v xcodegen >/dev/null 2>&1; then
+            HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 brew install xcodegen
+          fi
+          xcodegen --version
+          xcodegen generate
+
+      # ------------------------------------------------------------ firma Ad Hoc
+
+      - name: Preparar la clave de App Store Connect
+        if: steps.secrets.outputs.signed == 'true'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          set -euo pipefail
+          key_path="$RUNNER_TEMP/AuthKey_${ASC_KEY_ID}.p8"
+          python3 -c 'import os, sys; sys.path.insert(0, "scripts"); import asc; open(sys.argv[1], "w").write(asc.normalized_pem(os.environ["ASC_KEY_P8"]))' "$key_path"
+          chmod 600 "$key_path"
+          echo "ASC_KEY_PATH=$key_path" >> "$GITHUB_ENV"
+
+      - name: Validar la API de App Store Connect
+        if: steps.secrets.outputs.signed == 'true'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: python3 scripts/asc.py check
+
+      - name: Guardar los certificados de desarrollo existentes
+        if: steps.secrets.outputs.signed == 'true'
+        run: python3 scripts/asc.py snapshot-dev-certs "$RUNNER_TEMP/dev-certs-before.txt"
+
+      - name: Archive (firma automática)
+        if: steps.secrets.outputs.signed == 'true'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+          VERSION: ${{ steps.version.outputs.version }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build }}
+        run: |
+          set -o pipefail
+          beautify() { if command -v xcbeautify >/dev/null 2>&1; then xcbeautify --renderer github-actions; else cat; fi; }
+          # Xcode 16+ guarda los perfiles en UserData; se enlaza también la ruta clásica.
+          profiles="$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
+          legacy="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$profiles"
+          if [ ! -e "$legacy" ]; then
+            mkdir -p "$(dirname "$legacy")"
+            ln -s "$profiles" "$legacy"
+          fi
+          log="$RUNNER_TEMP/xcodebuild-archive.log"
+          archive() {
+            xcodebuild archive \
+              -project "$PROJECT" \
+              -scheme "$SCHEME" \
+              -configuration Release \
+              -destination 'generic/platform=iOS' \
+              -archivePath "$RUNNER_TEMP/LeoneraPaper.xcarchive" \
+              -allowProvisioningUpdates \
+              -authenticationKeyPath "$ASC_KEY_PATH" \
+              -authenticationKeyID "$ASC_KEY_ID" \
+              -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+              DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+              CODE_SIGN_STYLE=Automatic \
+              APP_BUNDLE_ID="$APP_BUNDLE_ID" \
+              SHARE_EXTENSION_BUNDLE_ID="$SHARE_EXTENSION_BUNDLE_ID" \
+              MARKETING_VERSION="$VERSION" \
+              CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+              GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID" \
+              2>&1 | tee -a "$log" | beautify
+          }
+          if archive; then exit 0; fi
+          # La primera vez que Xcode crea un perfil, el build puede buscarlo antes de que
+          # esté en disco ("Build input file cannot be found: …mobileprovision"). Con el
+          # perfil ya descargado, un segundo intento funciona.
+          if grep -q "cannot be found: .*\.mobileprovision" "$log"; then
+            echo "::notice title=Perfiles::Xcode acaba de crear los perfiles; se repite el archive."
+            archive
+          else
+            exit 1
+          fi
+
+      - name: Exportar el IPA Ad Hoc
+        if: steps.secrets.outputs.signed == 'true'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          beautify() { if command -v xcbeautify >/dev/null 2>&1; then xcbeautify --renderer github-actions; else cat; fi; }
+          options="$RUNNER_TEMP/ExportOptions.plist"
+          rm -f "$options"
+          /usr/libexec/PlistBuddy \
+            -c "Add :method string release-testing" \
+            -c "Add :signingStyle string automatic" \
+            -c "Add :teamID string $APPLE_TEAM_ID" \
+            -c "Add :thinning string <none>" \
+            -c "Add :stripSwiftSymbols bool true" \
+            "$options"
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/LeoneraPaper.xcarchive" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist "$options" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            2>&1 | tee "$RUNNER_TEMP/xcodebuild-export.log" | beautify
+          ipa=$(find "$RUNNER_TEMP/export" -maxdepth 1 -name '*.ipa' | head -n 1)
+          if [ -z "$ipa" ]; then
+            echo "::error title=Exportación::xcodebuild no generó ningún IPA."
+            exit 1
+          fi
+          mkdir -p dist
+          mv "$ipa" "dist/$IPA_NAME"
+
+      - name: Verificar los perfiles Ad Hoc
+        if: steps.secrets.outputs.signed == 'true'
+        run: python3 scripts/verify-ipa.py "dist/$IPA_NAME"
+
+      # ------------------------------------------------------------ sin firma
+
+      - name: Compilar sin firmar
+        if: steps.secrets.outputs.signed != 'true'
+        env:
+          GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+          VERSION: ${{ steps.version.outputs.version }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build }}
+        run: |
+          set -euo pipefail
+          beautify() { if command -v xcbeautify >/dev/null 2>&1; then xcbeautify --renderer github-actions; else cat; fi; }
+          xcodebuild archive \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/LeoneraPaper.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" \
+            APP_BUNDLE_ID="$APP_BUNDLE_ID" \
+            SHARE_EXTENSION_BUNDLE_ID="$SHARE_EXTENSION_BUNDLE_ID" \
+            MARKETING_VERSION="$VERSION" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID" \
+            2>&1 | tee "$RUNNER_TEMP/xcodebuild-archive.log" | beautify
+          app=$(find "$RUNNER_TEMP/LeoneraPaper.xcarchive/Products/Applications" -maxdepth 1 -name '*.app' | head -n 1)
+          mkdir -p "$RUNNER_TEMP/unsigned/Payload" dist
+          cp -R "$app" "$RUNNER_TEMP/unsigned/Payload/"
+          (cd "$RUNNER_TEMP/unsigned" && zip -qry "$GITHUB_WORKSPACE/dist/LeoneraPaper-unsigned.ipa" Payload)
+          {
+            echo "## Leonera Paper ${{ steps.version.outputs.tag }} (sin firmar)"
+            echo
+            echo "No hay secrets de firma configurados: el IPA sin firmar está en los artefactos de esta ejecución y no se publica en GitHub Pages."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Subir el IPA como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: LeoneraPaper-${{ steps.version.outputs.tag }}
+          path: dist/*.ipa
+          if-no-files-found: error
+
+      # ------------------------------------------------------------ publicación
+
+      - name: Publicar en GitHub Pages
+        id: pages
+        if: steps.secrets.outputs.signed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build }}
+          CHANNEL: ${{ steps.version.outputs.channel }}
+        run: |
+          set -euo pipefail
+          base=$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.html_url' 2>/dev/null || true)
+          if [ -z "$base" ]; then
+            owner=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+            base="https://${owner}.github.io/${GITHUB_REPOSITORY#*/}/"
+          fi
+          base="${base%/}/"
+          scripts/publish-pages.sh \
+            --tag "$TAG" \
+            --ipa "dist/$IPA_NAME" \
+            --base-url "$base" \
+            --version "$VERSION" \
+            --build "$BUILD_NUMBER" \
+            --channel "$CHANNEL" \
+            --branch "$GITHUB_REF_NAME" \
+            --sha "$GITHUB_SHA" \
+            --icon App/Assets.xcassets/AppIcon.appiconset/AppIcon.png \
+            --app-name "$APP_NAME" \
+            --bundle-id "$APP_BUNDLE_ID" \
+            --run-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+            --keep-prereleases 20
+          manifest="${base}${TAG}/manifest.plist"
+          encoded=$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$manifest")
+          {
+            echo "base_url=$base"
+            echo "page_url=${base}${TAG}/"
+            echo "install_url=itms-services://?action=download-manifest&url=${encoded}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Crear la release
+        if: steps.secrets.outputs.signed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build }}
+          CHANNEL: ${{ steps.version.outputs.channel }}
+          PAGE_URL: ${{ steps.pages.outputs.page_url }}
+          BASE_URL: ${{ steps.pages.outputs.base_url }}
+        run: |
+          set -euo pipefail
+          notes="$RUNNER_TEMP/release-notes.md"
+          {
+            echo "📲 **Instalar en el iPhone:** ${PAGE_URL}"
+            echo
+            echo "Abre el enlace en Safari en un iPhone registrado y pulsa «Instalar en el iPhone»."
+            echo
+            echo "- Versión: ${VERSION} (${BUILD_NUMBER})"
+            echo "- Rama: ${GITHUB_REF_NAME}"
+            echo "- Commit: ${GITHUB_SHA}"
+            echo "- Todas las versiones: ${BASE_URL}"
+          } > "$notes"
+          if [ "$CHANNEL" = "stable" ]; then
+            gh release create "$TAG" "dist/$IPA_NAME" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title "$APP_NAME $TAG" --notes-file "$notes" --latest
+          else
+            gh release create "$TAG" "dist/$IPA_NAME" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title "$APP_NAME $TAG ($GITHUB_REF_NAME)" --notes-file "$notes" --prerelease --latest=false
+          fi
+
+      - name: Resumen
+        if: steps.pages.outputs.page_url != ''
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build }}
+          PAGE_URL: ${{ steps.pages.outputs.page_url }}
+          BASE_URL: ${{ steps.pages.outputs.base_url }}
+          INSTALL_URL: ${{ steps.pages.outputs.install_url }}
+        run: |
+          {
+            echo "## $APP_NAME $TAG"
+            echo
+            echo "📲 **[Instalar en el iPhone]($PAGE_URL)** — abre el enlace en Safari en un iPhone registrado."
+            echo
+            echo "- Versión: $VERSION ($BUILD_NUMBER) · rama \`$GITHUB_REF_NAME\`"
+            echo "- Todas las versiones: $BASE_URL"
+            echo "- Enlace de instalación directo: \`$INSTALL_URL\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # ------------------------------------------------------------ limpieza
+
+      - name: Revocar el certificado de desarrollo temporal
+        if: always() && steps.secrets.outputs.signed == 'true'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          python3 scripts/asc.py revoke-new-dev-certs "$RUNNER_TEMP/dev-certs-before.txt"
+          rm -f "${ASC_KEY_PATH:-}"
+
+      - name: Guardar los logs de xcodebuild
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-logs-${{ github.run_id }}
+          path: ${{ runner.temp }}/xcodebuild-*.log
+          if-no-files-found: ignore
