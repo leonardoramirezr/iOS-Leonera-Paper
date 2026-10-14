@@ -1,7 +1,7 @@
 # Leonera Paper
 
-App de iOS (SwiftUI, sin dependencias externas) para guardar artículos web como
-Markdown, leerlos con varios estilos, resaltarlos y consultar el diccionario.
+App de iOS (SwiftUI, sin dependencias externas) para guardar artículos web y PDF
+como Markdown, leerlos con varios estilos, resaltarlos y consultar el diccionario.
 
 ## Funciones
 
@@ -11,8 +11,20 @@ Markdown, leerlos con varios estilos, resaltarlos y consultar el diccionario.
   oculto, `App/Import/extractor.js` localiza el contenido principal (heurística al
   estilo Readability) y lo convierte a Markdown; las imágenes se descargan a la
   carpeta del artículo.
+- **PDF a Markdown**: también acepta PDF, desde el botón **+** (*Elegir PDF…*), con
+  *Abrir en Leonera Paper* desde Archivos, Mail o cualquier app que comparta un PDF,
+  o pegando/compartiendo el enlace a un PDF (se detecta por la extensión o por el
+  tipo de contenido que devuelve el servidor). `App/Import/PDFConverter.swift` lo
+  convierte con PDFKit: agrupa las líneas en párrafos según su posición, detecta
+  títulos (por tamaño de letra o negrita), listas, bloques de código (fuente
+  monoespaciada), negritas y cursivas; quita encabezados, pies y números de página
+  repetidos y une las palabras cortadas con guion. Las páginas escaneadas pasan por
+  el OCR de Vision (y, si no tienen texto, se guardan como imagen) y las imágenes
+  incrustadas se extraen a `images/`. El PDF original se guarda junto al Markdown y
+  se puede ver desde el menú del artículo (*Ver PDF original*).
 - **Almacenamiento local** en *Archivos › En mi iPhone › Leonera Paper*: una carpeta
-  por artículo con `<artículo>.md` (con *front matter* YAML) y `images/`.
+  por artículo con `<artículo>.md` (con *front matter* YAML), `images/` y, si viene
+  de un PDF, `<artículo>.pdf`.
 - **Google Drive (opcional)**: copia cada artículo en la carpeta *Leonera Paper* de
   tu Drive y actualiza el Markdown cuando cambian los resaltados.
 - **Resaltado**: al seleccionar texto aparece, justo debajo (o encima si la palabra
@@ -57,7 +69,7 @@ Oxford no ofrece una API gratuita, así que hay dos modos:
 | Ruta | Contenido |
 | --- | --- |
 | `project.yml` | Proyecto de [XcodeGen](https://github.com/yonaskolb/XcodeGen) (app + extensión de compartir). |
-| `App/` | App SwiftUI: biblioteca, importación, lector, diccionario y Google Drive. |
+| `App/` | App SwiftUI: biblioteca, importación (web y PDF), lector, diccionario y Google Drive. |
 | `App/Markdown/` | Intérprete de Markdown con mapa de posiciones (para escribir `==…==` en el sitio exacto). |
 | `ShareExtension/` | Extensión «Compartir» de Safari. |
 | `Shared/` | Código común: cola de enlaces pendientes en un grupo de llavero. |

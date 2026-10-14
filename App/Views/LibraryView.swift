@@ -1,3 +1,4 @@
+import QuickLook
 import SwiftUI
 import UIKit
 
@@ -10,6 +11,7 @@ struct LibraryView: View {
     @State private var search = ""
     @State private var showsAdd = false
     @State private var showsSettings = false
+    @State private var previewURL: URL?
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -62,7 +64,7 @@ struct LibraryView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .accessibilityLabel("Añadir por URL")
+                    .accessibilityLabel("Añadir URL o PDF")
                 }
             }
             .overlay {
@@ -70,9 +72,9 @@ struct LibraryView: View {
                     ContentUnavailableView {
                         Label("Sin artículos", systemImage: "doc.richtext")
                     } description: {
-                        Text("Comparte una página desde Safari con «Leonera Paper» o pulsa + para pegar una URL.")
+                        Text("Comparte una página desde Safari con «Leonera Paper» o pulsa + para pegar una URL o elegir un PDF.")
                     } actions: {
-                        Button("Añadir URL") { showsAdd = true }
+                        Button("Añadir URL o PDF") { showsAdd = true }
                             .buttonStyle(.borderedProminent)
                     }
                 } else if !search.isEmpty && filteredArticles.isEmpty {
@@ -94,6 +96,7 @@ struct LibraryView: View {
             .sheet(isPresented: $showsSettings) {
                 SettingsView()
             }
+            .quickLookPreview($previewURL)
         }
     }
 
@@ -112,10 +115,19 @@ struct LibraryView: View {
         ShareLink(item: library.markdownURL(for: article)) {
             Label("Compartir Markdown", systemImage: "square.and.arrow.up")
         }
-        Button {
-            openURL(article.sourceURL)
-        } label: {
-            Label("Abrir original", systemImage: "safari")
+        if let source = article.sourceURL {
+            Button {
+                openURL(source)
+            } label: {
+                Label("Abrir original", systemImage: "safari")
+            }
+        }
+        if let pdf = library.pdfURL(for: article) {
+            Button {
+                previewURL = pdf
+            } label: {
+                Label("Ver PDF original", systemImage: "doc.richtext")
+            }
         }
         if drive.isConnected {
             Button {
@@ -212,7 +224,7 @@ private struct ImportJobRow: View {
                     .foregroundStyle(.orange)
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text(job.url.host ?? job.url.absoluteString)
+                Text(job.displayName)
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
                 Text(job.error ?? job.status)

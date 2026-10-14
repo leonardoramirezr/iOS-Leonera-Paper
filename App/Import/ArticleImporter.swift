@@ -4,9 +4,18 @@ import Foundation
 @MainActor
 enum ArticleImporter {
     static func importArticle(from url: URL, storage: ArticleStorage,
-                              progress: (String) -> Void) async throws -> Article {
+                              progress: @escaping @MainActor (String) -> Void) async throws -> Article {
+        if url.pathExtension.lowercased() == "pdf" {
+            return try await PDFImporter.importRemotePDF(from: url, storage: storage, progress: progress)
+        }
         progress("Cargando la página…")
-        let extracted = try await ArticleExtractor.extract(from: url)
+        let extracted: ExtractedArticle
+        do {
+            extracted = try await ArticleExtractor.extract(from: url)
+        } catch ExtractionError.pdfDocument(let pdfURL) {
+            // La página resultó ser un PDF (p. ej., un enlace de descarga sin «.pdf»).
+            return try await PDFImporter.importRemotePDF(from: pdfURL ?? url, storage: storage, progress: progress)
+        }
         let finalURL = extracted.url.flatMap(URL.init(string:)) ?? url
         let title = extracted.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             ? (finalURL.host ?? "Artículo")
@@ -109,7 +118,7 @@ enum ArticleImporter {
     }
 
     /// Escapa texto plano para que no se interprete como Markdown.
-    static func escape(_ text: String) -> String {
+    nonisolated static func escape(_ text: String) -> String {
         var result = ""
         for character in text {
             if "\\`*_[]<".contains(character) { result.append("\\") }
@@ -118,13 +127,13 @@ enum ArticleImporter {
         return result.replacingOccurrences(of: "==", with: "=\\=")
     }
 
-    static func escapeURL(_ url: String) -> String {
+    nonisolated static func escapeURL(_ url: String) -> String {
         url.replacingOccurrences(of: " ", with: "%20")
             .replacingOccurrences(of: "(", with: "%28")
             .replacingOccurrences(of: ")", with: "%29")
     }
 
-    private static func yaml(_ value: String) -> String {
+    nonisolated static func yaml(_ value: String) -> String {
         let escaped = value
             .replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "\"", with: "\\\"")
@@ -132,7 +141,7 @@ enum ArticleImporter {
         return "\"\(escaped)\""
     }
 
-    private static func displayDate(_ value: String?) -> String? {
+    nonisolated static func displayDate(_ value: String?) -> String? {
         guard let value, !value.isEmpty else { return nil }
         let parsers: [ISO8601DateFormatter] = {
             let full = ISO8601DateFormatter()

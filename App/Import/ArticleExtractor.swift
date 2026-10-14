@@ -20,6 +20,8 @@ enum ExtractionError: LocalizedError {
     case loadFailed(String)
     case noContent
     case invalidResult
+    /// La dirección devuelve un PDF en lugar de una página web.
+    case pdfDocument(URL?)
 
     var errorDescription: String? {
         switch self {
@@ -27,6 +29,7 @@ enum ExtractionError: LocalizedError {
         case .loadFailed(let reason): return "No se pudo cargar la página: \(reason)"
         case .noContent: return "No se encontró el texto del artículo en esa página."
         case .invalidResult: return "La página devolvió un resultado inesperado."
+        case .pdfDocument: return "La dirección es un PDF, no una página web."
         }
     }
 }
@@ -122,6 +125,19 @@ final class ArticleExtractor: NSObject, WKNavigationDelegate {
         } else {
             continuation.resume()
         }
+    }
+
+    func webView(_ webView: WKWebView,
+                 decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
+        guard navigationResponse.isForMainFrame, Self.isPDF(navigationResponse.response) else { return .allow }
+        finishLoading(error: ExtractionError.pdfDocument(navigationResponse.response.url))
+        return .cancel
+    }
+
+    private static func isPDF(_ response: URLResponse) -> Bool {
+        let mimeType = response.mimeType?.lowercased() ?? ""
+        if mimeType == "application/pdf" || mimeType == "application/x-pdf" { return true }
+        return mimeType == "application/octet-stream" && response.url?.pathExtension.lowercased() == "pdf"
     }
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
