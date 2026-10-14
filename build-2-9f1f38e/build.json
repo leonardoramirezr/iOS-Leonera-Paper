@@ -1,0 +1,17 @@
+{
+  "tag": "build-2-9f1f38e",
+  "version": "0.0.2",
+  "build": "2",
+  "channel": "prerelease",
+  "branch": "claude/laughing-knuth-dr615h",
+  "sha": "9f1f38e534f7ac65ec38e524c262c1f61e4cfee3",
+  "created": "2026-10-14T06:29:25Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/38522328927",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-2-9f1f38e/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-2-9f1f38e/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-2-9f1f38e%2Fmanifest.plist"
+}
