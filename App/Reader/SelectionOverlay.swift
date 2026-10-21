@@ -52,7 +52,7 @@ struct SelectionOverlay: View {
             if let selection = model.selection, isVisible(selection.rect) {
                 let layout = OverlayLayout(word: selection.rect, container: size, wantsDictionary: model.lookupTerm != nil)
                 if let frame = layout.dictionary, let term = model.lookupTerm {
-                    DictionaryPanel(term: term, theme: theme)
+                    DictionaryPanel(term: term, theme: theme, onClose: { model.dismissDictionary() })
                         .frame(width: frame.width, height: frame.height)
                         .position(x: frame.midX, y: frame.midY)
                         .transition(.opacity)

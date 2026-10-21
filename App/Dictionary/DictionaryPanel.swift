@@ -5,6 +5,7 @@ import UIKit
 struct DictionaryPanel: View {
     let term: String
     let theme: ReaderTheme
+    let onClose: () -> Void
 
     @Environment(DictionaryService.self) private var dictionary
     @State private var override: DictionarySource?
@@ -81,6 +82,18 @@ struct DictionaryPanel: View {
                     .foregroundStyle(Color(theme.text))
             }
             .accessibilityLabel("Cambiar diccionario")
+            Button(action: onClose) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(Color(theme.secondary))
+                    .frame(width: 30, height: 30)
+                    .background(Circle().fill(Color(theme.background)))
+                    .overlay(Circle().strokeBorder(Color(theme.isEInk ? theme.text : theme.secondary.withAlphaComponent(0.3)),
+                                                   lineWidth: theme.isEInk ? 1 : 0.5))
+                    .contentShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Cerrar diccionario")
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -101,7 +114,7 @@ struct DictionaryPanel: View {
     @ViewBuilder
     private var content: some View {
         if effective == .system {
-            SystemDictionaryView(term: term)
+            SystemDictionaryView(term: term, onClose: onClose)
         } else if !dictionary.hasOxfordCredentials {
             message(
                 "Para consultar \(effective.title) aquí hace falta una clave de la Oxford Dictionaries API (Ajustes › Diccionario).",
@@ -232,28 +245,63 @@ private struct SenseView: View {
 /// Diccionarios del sistema (en iOS: Oxford Spanish Dictionary, Oxford Dictionary of English…).
 struct SystemDictionaryView: UIViewControllerRepresentable {
     let term: String
+    let onClose: () -> Void
 
     func makeUIViewController(context: Context) -> Container {
         Container()
     }
 
     func updateUIViewController(_ controller: Container, context: Context) {
+        controller.onClose = onClose
         controller.show(term)
     }
 
+    /// El diccionario del sistema está pensado para presentarse de forma modal: su
+    /// botón de cerrar llama a `dismiss`, que no hace nada al estar incrustado. Aquí
+    /// se intercepta para cerrar el panel. Tampoco debe quitarle el foco al lector.
+    final class ReferenceController: UIReferenceLibraryViewController {
+        var onClose: (() -> Void)?
+
+        override var canBecomeFirstResponder: Bool { false }
+
+        override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+            guard parent != nil, presentedViewController == nil else {
+                super.dismiss(animated: flag, completion: completion)
+                return
+            }
+            onClose?()
+            completion?()
+        }
+    }
+
     final class Container: UIViewController {
+        var onClose: (() -> Void)?
+        private(set) var shownAt = Date.distantPast
         private var currentTerm: String?
-        private var child: UIViewController?
+        private var child: ReferenceController?
+
+        override var canBecomeFirstResponder: Bool { false }
+
+        override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+            guard presentedViewController == nil else {
+                super.dismiss(animated: flag, completion: completion)
+                return
+            }
+            onClose?()
+            completion?()
+        }
 
         func show(_ term: String) {
             guard term != currentTerm else { return }
             currentTerm = term
+            shownAt = Date()
             if let child {
                 child.willMove(toParent: nil)
                 child.view.removeFromSuperview()
                 child.removeFromParent()
             }
-            let reference = UIReferenceLibraryViewController(term: term)
+            let reference = ReferenceController(term: term)
+            reference.onClose = { [weak self] in self?.onClose?() }
             addChild(reference)
             reference.view.frame = view.bounds
             reference.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
