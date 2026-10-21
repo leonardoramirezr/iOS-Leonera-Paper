@@ -8,6 +8,35 @@ final class ReaderUITextView: UITextView {
         false
     }
 
+    private var lastFocusReclaim = Date.distantPast
+
+    /// Al aparecer, el diccionario del sistema toma el foco y la selección (con sus
+    /// asas para ampliarla) deja de dibujarse. Si el foco se lo ha llevado el
+    /// diccionario, se recupera para que la palabra siga marcada.
+    override func resignFirstResponder() -> Bool {
+        let resigned = super.resignFirstResponder()
+        if resigned, selectedRange.length > 0 {
+            DispatchQueue.main.async { [weak self] in self?.reclaimFocusIfTakenByDictionary() }
+        }
+        return resigned
+    }
+
+    private func reclaimFocusIfTakenByDictionary() {
+        guard selectedRange.length > 0, window != nil, !isFirstResponder,
+              Date().timeIntervalSince(lastFocusReclaim) > 0.5 else { return }
+        if let responder = UIResponder.current {
+            // Solo si lo tomó al aparecer, no si el usuario toca su campo de búsqueda.
+            var next: UIResponder? = responder
+            while let current = next, !(current is SystemDictionaryView.Container) {
+                next = current.next
+            }
+            guard let container = next as? SystemDictionaryView.Container,
+                  Date().timeIntervalSince(container.shownAt) < 2 else { return }
+        }
+        lastFocusReclaim = Date()
+        becomeFirstResponder()
+    }
+
     /// Índice del primer carácter visible, para conservar la posición al volver a maquetar.
     func topVisibleCharacterIndex() -> Int? {
         guard textStorage.length > 0 else { return nil }
@@ -116,5 +145,20 @@ struct ReaderTextView: UIViewRepresentable {
             // Menú vacío: no se muestra el menú del sistema.
             UIMenu(children: [])
         }
+    }
+}
+
+extension UIResponder {
+    private static weak var captured: UIResponder?
+
+    /// Primer respondedor actual de la app.
+    static var current: UIResponder? {
+        captured = nil
+        UIApplication.shared.sendAction(#selector(captureFirstResponder), to: nil, from: nil, for: nil)
+        return captured
+    }
+
+    @objc private func captureFirstResponder() {
+        UIResponder.captured = self
     }
 }

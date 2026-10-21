@@ -29,6 +29,8 @@ final class ReaderModel {
     @ObservationIgnored private var layoutWidth: CGFloat = 0
     @ObservationIgnored private var layoutKey = ""
     @ObservationIgnored private var lookupTask: Task<Void, Never>?
+    /// El usuario cerró el diccionario: no se vuelve a abrir hasta una nueva selección.
+    @ObservationIgnored private var dictionaryDismissed = false
     @ObservationIgnored private var restoredProgress = false
     @ObservationIgnored private var loaded = false
     @ObservationIgnored private weak var lastPreferences: ReaderPreferences?
@@ -121,6 +123,7 @@ final class ReaderModel {
 
     private func scheduleLookup(for text: String) {
         lookupTask?.cancel()
+        guard !dictionaryDismissed else { return }
         let term = DictionaryService.lookupTerm(from: text)
         guard let term else {
             lookupTerm = nil
@@ -141,6 +144,17 @@ final class ReaderModel {
         lookupTask?.cancel()
         selection = nil
         lookupTerm = nil
+        dictionaryDismissed = false
+    }
+
+    /// Cierra el panel del diccionario conservando la selección y el botón de resaltar.
+    func dismissDictionary() {
+        lookupTask?.cancel()
+        dictionaryDismissed = true
+        lookupTerm = nil
+        if let textView, textView.selectedRange.length > 0, !textView.isFirstResponder {
+            textView.becomeFirstResponder()
+        }
     }
 
     func clearSelection() {
