@@ -274,11 +274,55 @@ struct SystemDictionaryView: UIViewControllerRepresentable {
         }
     }
 
+    /// Fondo opaco en la esquina que se desvanece hacia fuera, para tapar también
+    /// la sombra del botón sin que se note el borde de la tapa.
+    final class CloseCover: UIView {
+        override class var layerClass: AnyClass { CAGradientLayer.self }
+
+        private var gradient: CAGradientLayer { layer as! CAGradientLayer }
+
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            gradient.type = .radial
+            gradient.startPoint = CGPoint(x: 1, y: 0)
+            gradient.endPoint = CGPoint(x: 0, y: 1)
+            gradient.locations = [0.8, 1]
+            updateColors()
+            registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (self: CloseCover, _) in
+                self.updateColors()
+            }
+        }
+
+        required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+        private func updateColors() {
+            let color = UIColor.systemBackground.resolvedColor(with: traitCollection)
+            gradient.colors = [color.cgColor, color.withAlphaComponent(0).cgColor]
+        }
+    }
+
     final class Container: UIViewController {
         var onClose: (() -> Void)?
         private(set) var shownAt = Date.distantPast
         private var currentTerm: String?
         private var child: ReferenceController?
+
+        /// Tapa el botón de cerrar del diccionario del sistema (arriba a la derecha),
+        /// que sobra porque el panel ya tiene el suyo. No se puede quitar porque lo
+        /// dibuja el propio diccionario; la tapa también absorbe los toques.
+        private lazy var closeCover: UIView = {
+            let cover = CloseCover()
+            cover.isAccessibilityElement = false
+            cover.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(cover)
+            NSLayoutConstraint.activate([
+                cover.topAnchor.constraint(equalTo: view.topAnchor),
+                cover.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                cover.widthAnchor.constraint(equalToConstant: 140),
+                cover.heightAnchor.constraint(equalToConstant: 110),
+            ])
+            return cover
+        }()
 
         override var canBecomeFirstResponder: Bool { false }
 
@@ -308,6 +352,7 @@ struct SystemDictionaryView: UIViewControllerRepresentable {
             view.addSubview(reference.view)
             reference.didMove(toParent: self)
             child = reference
+            view.bringSubviewToFront(closeCover)
         }
     }
 }
