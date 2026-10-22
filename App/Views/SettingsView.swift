@@ -104,7 +104,7 @@ struct SettingsView: View {
                 }
 
                 Section("Acerca de") {
-                    LabeledContent("Versión", value: Self.version)
+                    LabeledContent("Build", value: Self.buildName)
                 }
             }
             .navigationTitle("Ajustes")
@@ -117,10 +117,7 @@ struct SettingsView: View {
         }
     }
 
-    private static var version: String {
-        let info = Bundle.main.infoDictionary
-        let version = info?["CFBundleShortVersionString"] as? String ?? "?"
-        let build = info?["CFBundleVersion"] as? String ?? "?"
-        return "\(version) (\(build))"
+    private static var buildName: String {
+        Bundle.main.infoDictionary?["LPBuildTag"] as? String ?? "?"
     }
 }

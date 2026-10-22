@@ -81,6 +81,8 @@
 	</array>
 	<key>GoogleClientID</key>
 	<string>$(GOOGLE_CLIENT_ID)</string>
+	<key>LPBuildTag</key>
+	<string>$(LP_BUILD_TAG)</string>
 	<key>LPSharedKeychainGroup</key>
 	<string>$(AppIdentifierPrefix)$(APP_BUNDLE_ID).shared</string>
 	<key>LPURLScheme</key>
