@@ -117,6 +117,23 @@ enum ArticleImporter {
             + "\n"
     }
 
+    /// Cambia el título de un Markdown ya guardado (front matter y encabezado `#`),
+    /// sin tocar el resto del texto ni los resaltados.
+    static func retitle(_ markdown: String, to title: String) -> String {
+        var lines = markdown.components(separatedBy: "\n")
+        var bodyStart = 0
+        if lines.first == "---", let end = lines.dropFirst().firstIndex(of: "---") {
+            for index in 1..<end where lines[index].hasPrefix("title:") {
+                lines[index] = "title: \(yaml(title))"
+            }
+            bodyStart = end + 1
+        }
+        if let heading = lines[bodyStart...].firstIndex(where: { $0.hasPrefix("# ") }) {
+            lines[heading] = "# \(escape(title))"
+        }
+        return lines.joined(separator: "\n")
+    }
+
     /// Escapa texto plano para que no se interprete como Markdown.
     nonisolated static func escape(_ text: String) -> String {
         var result = ""

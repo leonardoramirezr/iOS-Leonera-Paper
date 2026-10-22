@@ -12,6 +12,7 @@ struct LibraryView: View {
     @State private var showsAdd = false
     @State private var showsSettings = false
     @State private var previewURL: URL?
+    @State private var renaming: Article?
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -96,6 +97,9 @@ struct LibraryView: View {
             .sheet(isPresented: $showsSettings) {
                 SettingsView()
             }
+            .sheet(item: $renaming) { article in
+                RenameArticleView(article: article)
+            }
             .quickLookPreview($previewURL)
         }
     }
@@ -112,6 +116,11 @@ struct LibraryView: View {
 
     @ViewBuilder
     private func menu(for article: Article) -> some View {
+        Button {
+            renaming = article
+        } label: {
+            Label("Cambiar título", systemImage: "pencil")
+        }
         ShareLink(item: library.markdownURL(for: article)) {
             Label("Compartir Markdown", systemImage: "square.and.arrow.up")
         }

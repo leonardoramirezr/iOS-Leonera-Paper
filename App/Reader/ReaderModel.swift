@@ -203,6 +203,20 @@ final class ReaderModel {
     /// Tema activo para repintar los resaltados (lo fija la vista al maquetar).
     @ObservationIgnored var themeIDForDecorations: ReaderThemeID = .paper
 
+    /// Tras cambiar el título desde el lector se vuelve a leer el Markdown: si no, el
+    /// siguiente resaltado escribiría de nuevo la versión anterior.
+    func titleDidChange() {
+        guard let current = library.article(id: articleID), current.title != article.title else { return }
+        article = current
+        guard let updated = try? String(contentsOf: markdownURL, encoding: .utf8) else { return }
+        source = updated
+        document = MarkdownParser.parse(updated)
+        layoutKey = ""
+        if let lastPreferences {
+            layoutIfNeeded(width: layoutWidth, preferences: lastPreferences, displayScale: lastDisplayScale)
+        }
+    }
+
     // MARK: - Progreso de lectura
 
     func saveProgress() {

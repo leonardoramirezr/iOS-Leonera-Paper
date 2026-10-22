@@ -147,6 +147,25 @@ final class Library {
         persist()
     }
 
+    /// Cambia el título que se ve en la biblioteca y el del Markdown guardado. La carpeta
+    /// y el archivo conservan su nombre, así que las rutas de las imágenes no cambian.
+    func rename(_ id: UUID, to newTitle: String) {
+        let title = newTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty, let index = articles.firstIndex(where: { $0.id == id }),
+              articles[index].title != title else { return }
+        let url = storage.markdownURL(for: articles[index])
+        do {
+            let markdown = try String(contentsOf: url, encoding: .utf8)
+            try ArticleImporter.retitle(markdown, to: title).write(to: url, atomically: true, encoding: .utf8)
+        } catch {
+            notice = "No se pudo cambiar el título: \(error.localizedDescription)"
+            return
+        }
+        articles[index].title = title
+        persist()
+        markdownDidChange(id)
+    }
+
     func updateProgress(_ id: UUID, progress: Double) {
         guard let index = articles.firstIndex(where: { $0.id == id }) else { return }
         articles[index].readingProgress = min(max(progress, 0), 1)
