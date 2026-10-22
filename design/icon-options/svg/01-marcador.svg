@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="1024" viewBox="0 0 1024 1024"><defs>
+  <filter id="grain" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="11" stitchTiles="stitch"/>
+    <feColorMatrix type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.28  0 0 0 0 0.18  1.7 0 0 0 -0.78"/>
+  </filter>
+  <filter id="fibers" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624">
+    <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="5"/>
+    <feColorMatrix type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.28  0 0 0 0 0.18  0.9 0 0 0 -0.38"/>
+  </filter>
+  <filter id="marker" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035 0.55" numOctaves="2" seed="3" result="n1"/>
+    <feDisplacementMap in="SourceGraphic" in2="n1" scale="9" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.0035 0.11" numOctaves="3" seed="8" result="n2"/>
+    <feColorMatrix in="n2" type="matrix" values="0 0 0 0 0.95  0 0 0 0 0.66  0 0 0 0 0.05  1.5 0 0 0 -0.55" result="streak"/>
+    <feComposite in="streak" in2="d" operator="in" result="s2"/>
+    <feMerge><feMergeNode in="d"/><feMergeNode in="s2"/></feMerge>
+  </filter>
+  <filter id="b2" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="2"/></filter><filter id="b4" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="4"/></filter><filter id="b6" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="6"/></filter><filter id="b8" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="8"/></filter><filter id="b12" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="12"/></filter><filter id="b16" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="16"/></filter><filter id="b22" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="22"/></filter><filter id="b30" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="30"/></filter><filter id="b40" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="40"/></filter><filter id="b60" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="60"/></filter>
+  
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#36507A"/><stop offset=".55" stop-color="#1C2A44"/><stop offset="1" stop-color="#0E1628"/></linearGradient>
+    <radialGradient id="bgGlow" cx=".42" cy="-.05" r=".85"><stop offset="0" stop-color="#8FB0F0" stop-opacity=".55"/><stop offset="1" stop-color="#8FB0F0" stop-opacity="0"/></radialGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2=".25" y2="1"><stop offset="0" stop-color="#FFFEFA"/><stop offset="1" stop-color="#EFE9DC"/></linearGradient>
+    <radialGradient id="sheen" cx=".15" cy=".05" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <clipPath id="pageClip"><rect x="214" y="148" width="560" height="728" rx="30"/></clipPath>
+    <linearGradient id="p1tip" x1="0" y1="-1" x2="0" y2="1" gradientUnits="objectBoundingBox"><stop offset="0" stop-color="#FFE45A"/><stop offset=".6" stop-color="#F5C000"/><stop offset="1" stop-color="#D99A00"/></linearGradient>
+    <linearGradient id="p1nose" x1="0" y1="-44" x2="0" y2="44" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#A7AEB8"/><stop offset=".3" stop-color="#717883"/><stop offset=".75" stop-color="#2F333A"/><stop offset="1" stop-color="#5A616C"/></linearGradient>
+    <linearGradient id="p1body" x1="0" y1="-50" x2="0" y2="50" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFF4A6"/><stop offset=".22" stop-color="#FFE34B"/><stop offset=".55" stop-color="#FFCF00"/><stop offset=".85" stop-color="#E2A800"/><stop offset="1" stop-color="#B98400"/></linearGradient>
+    <linearGradient id="p1band" x1="0" y1="-50" x2="0" y2="50" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F2CE3A"/><stop offset=".5" stop-color="#C99A00"/><stop offset="1" stop-color="#8C6400"/></linearGradient>
+    <linearGradient id="p1label" x1="0" y1="-50" x2="0" y2="50" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#F2F0EA"/><stop offset="1" stop-color="#BDB7A6"/></linearGradient>
+  </defs>
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <rect width="1024" height="1024" fill="url(#bgGlow)"/>
+    <g transform="rotate(-5 512 512)">
+      <rect x="232" y="188" width="560" height="728" rx="30" fill="#040812" opacity=".55" filter="url(#b30)"/>
+      <rect x="217" y="155" width="560" height="728" rx="30" fill="#040812" opacity=".45" filter="url(#b6)"/>
+      <rect x="214" y="148" width="560" height="728" rx="30" fill="url(#paper)"/>
+      <g clip-path="url(#pageClip)">
+        <rect width="1024" height="1024" filter="url(#grain)" opacity=".35"/>
+        <rect width="1024" height="1024" filter="url(#fibers)" opacity=".25"/>
+        <rect x="214" y="148" width="560" height="728" fill="url(#sheen)" opacity=".5"/>
+        <rect x="278" y="222" width="109.5" height="32" rx="16" fill="#1D222A"/><rect x="405.5" y="222" width="153.5" height="32" rx="16" fill="#1D222A"/><rect x="278" y="270" width="117" height="32" rx="16" fill="#1D222A"/><rect x="413" y="270" width="95" height="32" rx="16" fill="#1D222A"/><rect x="278" y="333" width="51.5" height="14" rx="7" fill="#9BA1AA"/><rect x="341.5" y="333" width="60.8" height="14" rx="7" fill="#9BA1AA"/><rect x="414.3" y="333" width="53.7" height="14" rx="7" fill="#9BA1AA"/><rect x="278" y="396" width="89.7" height="16" rx="8" fill="#3A4049"/><rect x="381.7" y="396" width="42.6" height="16" rx="8" fill="#3A4049"/><rect x="438.3" y="396" width="33" height="16" rx="8" fill="#3A4049"/><rect x="485.3" y="396" width="52.7" height="16" rx="8" fill="#3A4049"/><rect x="551.9" y="396" width="78.8" height="16" rx="8" fill="#3A4049"/><rect x="644.8" y="396" width="53" height="16" rx="8" fill="#3A4049"/><rect x="278" y="450" width="84" height="16" rx="8" fill="#3A4049"/><rect x="376" y="450" width="58.5" height="16" rx="8" fill="#3A4049"/><rect x="448.5" y="450" width="35" height="16" rx="8" fill="#3A4049"/><rect x="497.5" y="450" width="31.9" height="16" rx="8" fill="#3A4049"/><rect x="543.4" y="450" width="54.7" height="16" rx="8" fill="#3A4049"/><rect x="612.2" y="450" width="29.9" height="16" rx="8" fill="#3A4049"/><rect x="656" y="450" width="40.5" height="16" rx="8" fill="#3A4049"/><rect x="278" y="504" width="76.7" height="16" rx="8" fill="#3A4049"/><rect x="368.7" y="504" width="45.4" height="16" rx="8" fill="#3A4049"/><rect x="428" y="504" width="31.6" height="16" rx="8" fill="#3A4049"/><rect x="473.7" y="504" width="69.4" height="16" rx="8" fill="#3A4049"/><rect x="557.1" y="504" width="30.7" height="16" rx="8" fill="#3A4049"/><rect x="601.8" y="504" width="65.8" height="16" rx="8" fill="#3A4049"/><rect x="681.6" y="504" width="28.4" height="16" rx="8" fill="#3A4049"/><rect x="278" y="558" width="55.9" height="16" rx="8" fill="#3A4049"/><rect x="347.9" y="558" width="83" height="16" rx="8" fill="#3A4049"/><rect x="444.9" y="558" width="55.9" height="16" rx="8" fill="#3A4049"/><rect x="514.8" y="558" width="75.8" height="16" rx="8" fill="#3A4049"/><rect x="604.5" y="558" width="86.9" height="16" rx="8" fill="#3A4049"/><rect x="278" y="612" width="68.2" height="16" rx="8" fill="#3A4049"/><rect x="360.2" y="612" width="32.4" height="16" rx="8" fill="#3A4049"/><rect x="406.5" y="612" width="38.2" height="16" rx="8" fill="#3A4049"/><rect x="458.7" y="612" width="37.3" height="16" rx="8" fill="#3A4049"/><rect x="510" y="612" width="61" height="16" rx="8" fill="#3A4049"/><rect x="585" y="612" width="28.1" height="16" rx="8" fill="#3A4049"/><rect x="627.1" y="612" width="69.1" height="16" rx="8" fill="#3A4049"/><rect x="278" y="666" width="35.8" height="16" rx="8" fill="#3A4049"/><rect x="327.8" y="666" width="39.1" height="16" rx="8" fill="#3A4049"/><rect x="381" y="666" width="30.6" height="16" rx="8" fill="#3A4049"/><rect x="425.6" y="666" width="89.3" height="16" rx="8" fill="#3A4049"/><rect x="528.9" y="666" width="55.7" height="16" rx="8" fill="#3A4049"/><rect x="598.6" y="666" width="37.4" height="16" rx="8" fill="#3A4049"/><rect x="649.9" y="666" width="60.1" height="16" rx="8" fill="#3A4049"/><rect x="278" y="720" width="49.5" height="16" rx="8" fill="#3A4049"/><rect x="341.5" y="720" width="76.2" height="16" rx="8" fill="#3A4049"/><rect x="431.7" y="720" width="41.8" height="16" rx="8" fill="#3A4049"/><rect x="487.5" y="720" width="58.4" height="16" rx="8" fill="#3A4049"/><rect x="559.9" y="720" width="87.5" height="16" rx="8" fill="#3A4049"/><rect x="661.4" y="720" width="37.2" height="16" rx="8" fill="#3A4049"/><rect x="278" y="774" width="45.8" height="16" rx="8" fill="#3A4049"/><rect x="337.8" y="774" width="66.7" height="16" rx="8" fill="#3A4049"/><rect x="418.5" y="774" width="66.8" height="16" rx="8" fill="#3A4049"/>
+        <g style="mix-blend-mode:multiply" ><rect x="264" y="544" width="365.6" height="44" rx="9.68" fill="#FFE24D" filter="url(#marker)" opacity="0.92"/></g>
+        <g transform="translate(643.6 600) rotate(36)" fill="#2A1E00" opacity=".38" filter="url(#b12)"><path d="M2,-13 L40,-22 L96,-44 L92,-50 H318 A50,50 0 0 1 318,50 H92 L96,44 L40,22 L9,13Z"/></g>
+      </g>
+      <rect x="214.75" y="148.75" width="558.5" height="726.5" rx="30" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1.5"/>
+      <g transform="translate(657.6 620) rotate(36)" fill="#020510" opacity=".45" filter="url(#b16)"><path d="M2,-13 L40,-22 L96,-44 L92,-50 H318 A50,50 0 0 1 318,50 H92 L96,44 L40,22 L9,13Z"/></g>
+      <g transform="translate(623.6 566) rotate(36)">
+    <path d="M2,-13 L40,-22 L40,22 L9,13 Q-1,0 2,-13Z" fill="url(#p1tip)"/>
+    <path d="M2,-13 L40,-22 L40,-12 L6,-5Z" fill="#fff" opacity=".35"/>
+    <path d="M38,-27 L96,-44 L96,44 L38,27Z" fill="url(#p1nose)"/>
+    <path d="M92,-50 H318 A50,50 0 0 1 318,50 H92Z" fill="url(#p1body)"/>
+    <rect x="92" y="-51" width="20" height="102" fill="url(#p1band)"/>
+    <rect x="126" y="-50" width="150" height="100" fill="url(#p1label)" opacity=".9"/>
+    <rect x="146" y="-14" width="100" height="9" rx="4.5" fill="#1D222A" opacity=".55"/>
+    <rect x="146" y="4" width="64" height="7" rx="3.5" fill="#1D222A" opacity=".35"/>
+    <rect x="276" y="-50" width="8" height="100" fill="#C08B00" opacity=".55"/>
+    <rect x="300" y="-50" width="5" height="100" fill="#B98600" opacity=".45"/>
+    <rect x="112" y="-41" width="236" height="11" rx="5.5" fill="#fff" opacity=".55" filter="url(#b2)"/>
+    <rect x="112" y="33" width="226" height="5" rx="2.5" fill="#FFF6C8" opacity=".35"/></g>
+    </g></svg>

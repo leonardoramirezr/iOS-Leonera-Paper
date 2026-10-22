@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="1024" viewBox="0 0 1024 1024"><defs>
+  <filter id="grain" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="11" stitchTiles="stitch"/>
+    <feColorMatrix type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.28  0 0 0 0 0.18  1.7 0 0 0 -0.78"/>
+  </filter>
+  <filter id="fibers" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624">
+    <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="5"/>
+    <feColorMatrix type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.28  0 0 0 0 0.18  0.9 0 0 0 -0.38"/>
+  </filter>
+  <filter id="marker" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035 0.55" numOctaves="2" seed="3" result="n1"/>
+    <feDisplacementMap in="SourceGraphic" in2="n1" scale="9" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.0035 0.11" numOctaves="3" seed="8" result="n2"/>
+    <feColorMatrix in="n2" type="matrix" values="0 0 0 0 0.95  0 0 0 0 0.66  0 0 0 0 0.05  1.5 0 0 0 -0.55" result="streak"/>
+    <feComposite in="streak" in2="d" operator="in" result="s2"/>
+    <feMerge><feMergeNode in="d"/><feMergeNode in="s2"/></feMerge>
+  </filter>
+  <filter id="b2" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="2"/></filter><filter id="b4" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="4"/></filter><filter id="b6" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="6"/></filter><filter id="b8" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="8"/></filter><filter id="b12" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="12"/></filter><filter id="b16" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="16"/></filter><filter id="b22" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="22"/></filter><filter id="b30" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="30"/></filter><filter id="b40" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="40"/></filter><filter id="b60" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1624" height="1624"><feGaussianBlur stdDeviation="60"/></filter>
+  
+    <linearGradient id="bg" x1="0" y1="0" x2=".5" y2="1"><stop offset="0" stop-color="#FFC94D"/><stop offset=".55" stop-color="#FF8A2B"/><stop offset="1" stop-color="#F2553A"/></linearGradient>
+    <radialGradient id="bgGlow" cx=".3" cy="0" r=".8"><stop offset="0" stop-color="#FFF6D0" stop-opacity=".6"/><stop offset="1" stop-color="#FFF6D0" stop-opacity="0"/></radialGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#F3F2F0"/></linearGradient>
+    <linearGradient id="pill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#48484C"/><stop offset=".5" stop-color="#2C2C2F"/><stop offset="1" stop-color="#1C1C1E"/></linearGradient>
+    <linearGradient id="pillRim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".5" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#fff" stop-opacity=".15"/></linearGradient>
+    <clipPath id="cardClip"><rect x="168" y="192" width="688" height="668" rx="58"/></clipPath>
+  </defs>
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <rect width="1024" height="1024" fill="url(#bgGlow)"/>
+    <rect x="174" y="228" width="688" height="668" rx="58" fill="#7A2200" opacity=".45" filter="url(#b30)"/>
+    <rect x="168" y="198" width="688" height="668" rx="58" fill="#7A2200" opacity=".25" filter="url(#b6)"/>
+    <rect x="168" y="192" width="688" height="668" rx="58" fill="url(#card)"/>
+    <g clip-path="url(#cardClip)">
+      <rect width="1024" height="1024" filter="url(#grain)" opacity=".12"/>
+      <rect x="440.9" y="424" width="363.1" height="56" rx="8" fill="#FFD84A"/><rect x="220" y="496" width="310.9" height="56" rx="8" fill="#FFD84A"/>
+      <rect x="232" y="273" width="178.1" height="38" rx="19" fill="#1C1C1E"/><rect x="430.1" y="273" width="181.9" height="38" rx="19" fill="#1C1C1E"/><rect x="232" y="369" width="106.5" height="22" rx="11" fill="#3A3A3C"/><rect x="356.5" y="369" width="66.6" height="22" rx="11" fill="#3A3A3C"/><rect x="441.1" y="369" width="46" height="22" rx="11" fill="#3A3A3C"/><rect x="505.1" y="369" width="63.6" height="22" rx="11" fill="#3A3A3C"/><rect x="586.7" y="369" width="60.9" height="22" rx="11" fill="#3A3A3C"/><rect x="665.6" y="369" width="68.3" height="22" rx="11" fill="#3A3A3C"/><rect x="751.9" y="369" width="40.1" height="22" rx="11" fill="#3A3A3C"/><rect x="232" y="441" width="106.7" height="22" rx="11" fill="#3A3A3C"/><rect x="356.7" y="441" width="74.2" height="22" rx="11" fill="#3A3A3C"/><rect x="448.9" y="441" width="108.1" height="22" rx="11" fill="#3A3A3C"/><rect x="575" y="441" width="99.4" height="22" rx="11" fill="#3A3A3C"/><rect x="692.4" y="441" width="77.1" height="22" rx="11" fill="#3A3A3C"/><rect x="232" y="513" width="84.4" height="22" rx="11" fill="#3A3A3C"/><rect x="334.4" y="513" width="78.2" height="22" rx="11" fill="#3A3A3C"/><rect x="430.5" y="513" width="92.4" height="22" rx="11" fill="#3A3A3C"/><rect x="540.9" y="513" width="91.4" height="22" rx="11" fill="#3A3A3C"/><rect x="650.3" y="513" width="64.3" height="22" rx="11" fill="#3A3A3C"/><rect x="732.7" y="513" width="59.3" height="22" rx="11" fill="#3A3A3C"/><rect x="232" y="585" width="47.7" height="22" rx="11" fill="#3A3A3C"/><rect x="297.7" y="585" width="104.3" height="22" rx="11" fill="#3A3A3C"/><rect x="420" y="585" width="57.1" height="22" rx="11" fill="#3A3A3C"/><rect x="495.1" y="585" width="89.1" height="22" rx="11" fill="#3A3A3C"/><rect x="602.2" y="585" width="107" height="22" rx="11" fill="#3A3A3C"/><rect x="727.2" y="585" width="64.8" height="22" rx="11" fill="#3A3A3C"/><rect x="232" y="801" width="42.5" height="22" rx="11" fill="#3A3A3C"/><rect x="292.5" y="801" width="44.7" height="22" rx="11" fill="#3A3A3C"/><rect x="355.2" y="801" width="43.6" height="22" rx="11" fill="#3A3A3C"/><rect x="416.8" y="801" width="50.4" height="22" rx="11" fill="#3A3A3C"/>
+    </g>
+    
+    <rect x="433.8713826537132" y="418" width="10" height="66" rx="5" fill="#0A84FF"/>
+    <circle cx="438.8713826537132" cy="406" r="19" fill="#0A84FF"/>
+    <circle cx="433.8713826537132" cy="401" r="6" fill="#fff" opacity=".45"/>
+    
+    <rect x="527.9165206216276" y="492" width="10" height="66" rx="5" fill="#0A84FF"/>
+    <circle cx="532.9165206216276" cy="570" r="19" fill="#0A84FF"/>
+    <circle cx="527.9165206216276" cy="565" r="6" fill="#fff" opacity=".45"/>
+    
+    <rect x="391.9" y="670" width="196" height="104" rx="52" fill="#3A1400" opacity=".45" filter="url(#b16)"/>
+    <rect x="387.9" y="652" width="196" height="104" rx="52" fill="url(#pill)"/>
+    <rect x="388.9" y="653" width="194" height="102" rx="52" fill="none" stroke="url(#pillRim)" stroke-width="2"/>
+    <g transform="translate(485.9 704)">
+      <rect x="-40" y="22" width="64" height="12" rx="4" fill="#FFD84A"/>
+      <g transform="rotate(40)">
+        <path d="M-11,-44 H11 A4,4 0 0 1 15,-40 V6 H-15 V-40 A4,4 0 0 1 -11,-44Z" fill="#fff"/>
+        <path d="M-15,10 H15 L9,24 H-9Z" fill="#fff"/>
+        <path d="M-8,28 H8 L4,38 H-6Z" fill="#FFD84A"/>
+      </g>
+    </g>
+  </svg>
