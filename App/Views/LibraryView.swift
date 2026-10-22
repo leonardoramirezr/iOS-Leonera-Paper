@@ -73,7 +73,7 @@ struct LibraryView: View {
                     ContentUnavailableView {
                         Label("Sin artículos", systemImage: "doc.richtext")
                     } description: {
-                        Text("Comparte una página desde Safari con «Leonera Paper» o pulsa + para pegar una URL o elegir un PDF.")
+                        Text("Comparte una página desde Safari con «Leonera Paper» o pulsa + para pegar una URL o un vídeo de YouTube, o elegir un PDF.")
                     } actions: {
                         Button("Añadir URL o PDF") { showsAdd = true }
                             .buttonStyle(.borderedProminent)
@@ -110,6 +110,7 @@ struct LibraryView: View {
         return library.articles.filter { article in
             article.title.localizedCaseInsensitiveContains(query)
                 || article.displaySite.localizedCaseInsensitiveContains(query)
+                || (article.isYouTubeVideo && article.author?.localizedCaseInsensitiveContains(query) == true)
                 || (article.excerpt?.localizedCaseInsensitiveContains(query) ?? false)
         }
     }
@@ -128,7 +129,11 @@ struct LibraryView: View {
             Button {
                 openURL(source)
             } label: {
-                Label("Abrir original", systemImage: "safari")
+                if article.isYouTubeVideo {
+                    Label("Ver en YouTube", systemImage: "play.rectangle")
+                } else {
+                    Label("Abrir original", systemImage: "safari")
+                }
             }
         }
         if let pdf = library.pdfURL(for: article) {
@@ -168,10 +173,20 @@ private struct ArticleRow: View {
                     Text(excerpt)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
+                        .lineLimit(article.isYouTubeVideo ? 3 : 2)
                 }
                 HStack(spacing: 6) {
-                    Text(article.displaySite)
+                    if article.isYouTubeVideo {
+                        Image(systemName: "play.rectangle.fill")
+                            .accessibilityLabel("Vídeo de YouTube")
+                        Text(article.author ?? article.displaySite)
+                        if let duration = article.videoDuration {
+                            Text("·")
+                            Text(YouTubeLink.formatDuration(duration))
+                        }
+                    } else {
+                        Text(article.displaySite)
+                    }
                     Text("·")
                     Text(article.savedAt, format: .dateTime.day().month(.abbreviated))
                     if let progress = article.readingProgress, progress > 0.02 {
@@ -189,6 +204,14 @@ private struct ArticleRow: View {
             Spacer(minLength: 0)
             if let lead = article.leadImage {
                 Thumbnail(url: imageFolder.appendingPathComponent(lead))
+                    .overlay {
+                        if article.isYouTubeVideo {
+                            Image(systemName: "play.fill")
+                                .font(.title3)
+                                .foregroundStyle(.white)
+                                .shadow(radius: 3)
+                        }
+                    }
             }
         }
         .padding(.vertical, 4)

@@ -13,7 +13,8 @@ final class Library {
         var error: String?
 
         var displayName: String {
-            url.isFileURL ? url.lastPathComponent : (url.host ?? url.absoluteString)
+            if YouTubeLink.isVideo(url) { return "Vídeo de YouTube" }
+            return url.isFileURL ? url.lastPathComponent : (url.host ?? url.absoluteString)
         }
     }
 
@@ -24,6 +25,7 @@ final class Library {
 
     let storage = ArticleStorage()
     @ObservationIgnored weak var drive: DriveSync?
+    @ObservationIgnored weak var youtube: YouTubeSettings?
     @ObservationIgnored private var pendingDriveUpdates: [UUID: Task<Void, Never>] = [:]
 
     init() {
@@ -81,6 +83,7 @@ final class Library {
     // MARK: - Importación
 
     func importArticle(from url: URL) {
+        let url = YouTubeLink.canonicalURL(for: url) ?? url
         guard !jobs.contains(where: { $0.url == url && $0.error == nil }) else { return }
         if !url.isFileURL, let existing = articles.first(where: { $0.sourceURL == url }) {
             notice = "«\(existing.title)» ya está en tu biblioteca."
@@ -100,6 +103,7 @@ final class Library {
     func dismiss(_ job: ImportJob) {
         jobs.removeAll { $0.id == job.id }
         removeStagedPDF(job.url)
+        YouTubeImporter.discardWorkFiles(for: job.url)
     }
 
     private func runImport(jobID: UUID, url: URL) async {
@@ -112,6 +116,10 @@ final class Library {
             if url.isFileURL {
                 article = try await PDFImporter.importPDF(at: url, sourceURL: nil, suggestedName: url.lastPathComponent,
                                                           storage: storage, progress: update)
+            } else if let videoID = YouTubeLink.videoID(from: url) {
+                article = try await YouTubeImporter.importVideo(id: videoID,
+                                                                settings: youtube?.configuration ?? YouTubeSettings.Configuration(),
+                                                                storage: storage, progress: update)
             } else {
                 article = try await ArticleImporter.importArticle(from: url, storage: storage, progress: update)
             }

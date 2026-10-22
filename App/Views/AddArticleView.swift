@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 /// Añadir un artículo pegando su URL o eligiendo un PDF.
 struct AddArticleView: View {
     @Environment(Library.self) private var library
+    @Environment(YouTubeSettings.self) private var youtube
     @Environment(\.dismiss) private var dismiss
     @State private var text = ""
     @State private var showsPDFPicker = false
@@ -24,8 +25,20 @@ struct AddArticleView: View {
                             text = url.absoluteString
                         }
                     }
+                    if let url, YouTubeLink.isVideo(url) {
+                        if youtube.hasAPIKeys {
+                            Label("Vídeo de YouTube: se transcribirá con Whisper y se resumirá con Gemini.",
+                                  systemImage: "play.rectangle")
+                                .font(.footnote)
+                        } else {
+                            Label("Para resumir vídeos de YouTube, añade las claves de Groq y Gemini en Ajustes › Resúmenes de YouTube.",
+                                  systemImage: "key")
+                                .font(.footnote)
+                                .foregroundStyle(.orange)
+                        }
+                    }
                 } footer: {
-                    Text("La página se convierte a Markdown con sus imágenes y se guarda en Archivos › En mi iPhone › Leonera Paper. También puedes compartirla desde Safari.")
+                    Text("La página se convierte a Markdown con sus imágenes y se guarda en Archivos › En mi iPhone › Leonera Paper. Un enlace de YouTube se guarda como resumen del vídeo. También puedes compartirlos desde Safari o la app de YouTube.")
                 }
                 Section {
                     Button {

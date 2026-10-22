@@ -73,7 +73,11 @@ struct ReaderView: View {
                         Button {
                             openURL(source)
                         } label: {
-                            Label("Abrir original", systemImage: "safari")
+                            if model.article.isYouTubeVideo {
+                                Label("Ver en YouTube", systemImage: "play.rectangle")
+                            } else {
+                                Label("Abrir original", systemImage: "safari")
+                            }
                         }
                     }
                     if let pdf = library.pdfURL(for: model.article) {
