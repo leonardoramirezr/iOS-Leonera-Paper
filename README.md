@@ -22,6 +22,11 @@ como Markdown, leerlos con varios estilos, resaltarlos y consultar el diccionari
   el OCR de Vision (y, si no tienen texto, se guardan como imagen) y las imágenes
   incrustadas se extraen a `images/`. El PDF original se guarda junto al Markdown y
   se puede ver desde el menú del artículo (*Ver PDF original*).
+- **Cambiar el título**: el título se toma solo al guardar, pero se puede editar
+  desde el menú de un artículo (mantener pulsado en la biblioteca, o *«⋯»* en el
+  lector). Se actualiza en la lista, en el *front matter* y el encabezado del
+  Markdown y, si está en Google Drive, en la copia subida. La carpeta y el archivo
+  conservan su nombre.
 - **Blogs para descubrir artículos**: la pestaña *Blogs* (barra inferior, junto a
   *Artículos*) guarda enlaces a la portada o el archivo de blogs, newsletters,
   Medium, Substack… Al pegar la URL (botón **+** de esa pestaña) se obtienen el

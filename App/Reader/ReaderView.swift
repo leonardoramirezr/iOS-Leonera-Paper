@@ -10,6 +10,7 @@ struct ReaderView: View {
 
     @State private var model: ReaderModel
     @State private var showsSettings = false
+    @State private var showsRename = false
     @State private var previewURL: URL?
 
     init(article: Article, library: Library) {
@@ -60,6 +61,11 @@ struct ReaderView: View {
                 }
 
                 Menu {
+                    Button {
+                        showsRename = true
+                    } label: {
+                        Label("Cambiar título", systemImage: "pencil")
+                    }
                     ShareLink(item: model.markdownURL) {
                         Label("Compartir Markdown", systemImage: "square.and.arrow.up")
                     }
@@ -93,6 +99,9 @@ struct ReaderView: View {
             }
         }
         .onDisappear { model.saveProgress() }
+        .sheet(isPresented: $showsRename, onDismiss: { model.titleDidChange() }) {
+            RenameArticleView(article: model.article)
+        }
         .quickLookPreview($previewURL)
     }
 
