@@ -259,47 +259,10 @@ struct SystemDictionaryView: UIViewControllerRepresentable {
     /// El diccionario del sistema está pensado para presentarse de forma modal: su
     /// botón de cerrar llama a `dismiss`, que no hace nada al estar incrustado. Aquí
     /// se intercepta para cerrar el panel. Tampoco debe quitarle el foco al lector.
-    /// Su botón de cerrar se oculta porque el panel ya tiene el suyo.
-    final class ReferenceController: UIReferenceLibraryViewController, UINavigationControllerDelegate {
+    final class ReferenceController: UIReferenceLibraryViewController {
         var onClose: (() -> Void)?
 
         override var canBecomeFirstResponder: Bool { false }
-
-        override func viewWillAppear(_ animated: Bool) {
-            super.viewWillAppear(animated)
-            hideCloseButtons()
-        }
-
-        override func viewDidLayoutSubviews() {
-            super.viewDidLayoutSubviews()
-            hideCloseButtons()
-        }
-
-        func navigationController(_ navigationController: UINavigationController,
-                                  willShow viewController: UIViewController, animated: Bool) {
-            viewController.navigationItem.rightBarButtonItems = nil
-        }
-
-        /// Quita los botones de la derecha de la barra de navegación interna (el de
-        /// cerrar), dejando el de volver para navegar entre definiciones.
-        private func hideCloseButtons() {
-            var pending: [UIViewController] = [self]
-            while let controller = pending.popLast() {
-                controller.navigationItem.rightBarButtonItems = nil
-                if let navigation = controller as? UINavigationController {
-                    if navigation.delegate == nil { navigation.delegate = self }
-                    navigation.viewControllers.forEach { $0.navigationItem.rightBarButtonItems = nil }
-                }
-                pending.append(contentsOf: controller.children)
-            }
-            var views: [UIView] = [view]
-            while let current = views.popLast() {
-                if let bar = current as? UINavigationBar {
-                    bar.items?.forEach { $0.rightBarButtonItems = nil }
-                }
-                views.append(contentsOf: current.subviews)
-            }
-        }
 
         override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
             guard parent != nil, presentedViewController == nil else {
@@ -316,6 +279,24 @@ struct SystemDictionaryView: UIViewControllerRepresentable {
         private(set) var shownAt = Date.distantPast
         private var currentTerm: String?
         private var child: ReferenceController?
+
+        /// Tapa el botón de cerrar del diccionario del sistema (arriba a la derecha),
+        /// que sobra porque el panel ya tiene el suyo. No se puede quitar porque lo
+        /// dibuja el propio diccionario; la tapa también absorbe los toques.
+        private lazy var closeCover: UIView = {
+            let cover = UIView()
+            cover.backgroundColor = .systemBackground
+            cover.isAccessibilityElement = false
+            cover.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(cover)
+            NSLayoutConstraint.activate([
+                cover.topAnchor.constraint(equalTo: view.topAnchor),
+                cover.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                cover.widthAnchor.constraint(equalToConstant: 72),
+                cover.heightAnchor.constraint(equalToConstant: 64),
+            ])
+            return cover
+        }()
 
         override var canBecomeFirstResponder: Bool { false }
 
@@ -345,6 +326,7 @@ struct SystemDictionaryView: UIViewControllerRepresentable {
             view.addSubview(reference.view)
             reference.didMove(toParent: self)
             child = reference
+            view.bringSubviewToFront(closeCover)
         }
     }
 }
