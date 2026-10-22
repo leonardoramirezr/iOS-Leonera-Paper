@@ -15,6 +15,7 @@ import os
 import plistlib
 import re
 import shutil
+import subprocess
 import urllib.parse
 
 STYLE = """
@@ -76,6 +77,14 @@ def format_date(value: str) -> str:
         return moment.strftime("%Y-%m-%d %H:%M UTC")
     except ValueError:
         return value
+
+
+def commit_title_for(sha: str) -> str:
+    # Builds published before commit_title was stored have no title in build.json.
+    # The workflow checks out the full history, so the title can be read from git.
+    result = subprocess.run(["git", "log", "-1", "--format=%s", sha],
+                            capture_output=True, text=True, check=False)
+    return result.stdout.strip() if result.returncode == 0 else ""
 
 
 def command_build(args: argparse.Namespace) -> None:
@@ -166,6 +175,8 @@ def command_index(args: argparse.Namespace) -> None:
         except (OSError, ValueError):
             shutil.rmtree(path)
             continue
+        if not data.get("commit_title") and data.get("sha"):
+            data["commit_title"] = commit_title_for(str(data["sha"]))
         data["_dir"] = name
         builds.append(data)
 
@@ -187,8 +198,10 @@ def command_index(args: argparse.Namespace) -> None:
         for build in items:
             meta = f"{esc(build.get('version', ''))} ({esc(build.get('build', ''))}) · {esc(build.get('branch', ''))} · " \
                    f"<code>{esc(str(build.get('sha', ''))[:7])}</code> · {esc(format_date(str(build.get('created', ''))))}"
+            subject = build.get("commit_title") or ""
+            subject_html = f'<div class="subject">{esc(subject)}</div>' if subject else ""
             result.append(f"""<div class="row">
-  <div><a class="title" href="{esc(build['_dir'])}/">{esc(build['_dir'])}</a><div class="subject">{esc(build.get('commit_title', ''))}</div><div class="muted">{meta}</div></div>
+  <div><a class="title" href="{esc(build['_dir'])}/">{esc(build['_dir'])}</a>{subject_html}<div class="muted">{meta}</div></div>
   <a class="button small" href="{esc(install_link(manifest_for(build)))}">Instalar</a>
 </div>""")
         return '<div class="card">' + "\n".join(result) + "</div>"
