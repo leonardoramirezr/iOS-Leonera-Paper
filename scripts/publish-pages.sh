@@ -10,13 +10,13 @@
 # Uso:
 #   scripts/publish-pages.sh --tag TAG --ipa RUTA --base-url URL --version X.Y.Z --build N \
 #     --channel stable|prerelease --branch RAMA --sha SHA --icon ICONO_1024.png \
-#     [--app-name NOMBRE] [--bundle-id ID] [--run-url URL] [--keep-prereleases 20]
+#     [--commit-title TITULO] [--app-name NOMBRE] [--bundle-id ID] [--run-url URL] [--keep-prereleases 20]
 #
 # Requiere GH_TOKEN (o GITHUB_TOKEN) con permiso de escritura y GITHUB_REPOSITORY.
 set -euo pipefail
 
 TAG="" IPA="" BASE_URL="" VERSION="" BUILD="" CHANNEL="" BRANCH="" SHA="" ICON=""
-APP_NAME="Leonera Paper" BUNDLE_ID="" RUN_URL="" KEEP_PRERELEASES=20
+APP_NAME="Leonera Paper" BUNDLE_ID="" RUN_URL="" KEEP_PRERELEASES=20 COMMIT_TITLE=""
 REPO="${GITHUB_REPOSITORY:-}"
 TOKEN="${GH_TOKEN:-${GITHUB_TOKEN:-}}"
 
@@ -30,6 +30,7 @@ while [ $# -gt 0 ]; do
     --channel) CHANNEL="$2"; shift 2 ;;
     --branch) BRANCH="$2"; shift 2 ;;
     --sha) SHA="$2"; shift 2 ;;
+    --commit-title) COMMIT_TITLE="$2"; shift 2 ;;
     --icon) ICON="$2"; shift 2 ;;
     --app-name) APP_NAME="$2"; shift 2 ;;
     --bundle-id) BUNDLE_ID="$2"; shift 2 ;;
@@ -79,7 +80,7 @@ make_icon 512 "$BUILD_DIR/icon-512.png"
 python3 "$SCRIPT_DIR/pages_site.py" build \
   --dir "$BUILD_DIR" --tag "$TAG" --ipa "$IPA_NAME" --base-url "$BASE_URL" --version "$VERSION" \
   --build "$BUILD" --channel "$CHANNEL" --branch "$BRANCH" --sha "$SHA" --app-name "$APP_NAME" \
-  --bundle-id "$BUNDLE_ID" --repo "$REPO" --run-url "$RUN_URL"
+  --bundle-id "$BUNDLE_ID" --repo "$REPO" --run-url "$RUN_URL" --commit-title "$COMMIT_TITLE"
 
 # ---------------------------------------------------------------- publicación
 

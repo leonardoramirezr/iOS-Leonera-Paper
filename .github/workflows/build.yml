@@ -83,13 +83,16 @@ jobs:
             version="0.${last_minor}.${GITHUB_RUN_NUMBER}"
             channel=prerelease
           fi
+          commit_title=$(git log -1 --format=%s "$GITHUB_SHA")
           {
             echo "tag=$tag"
             echo "version=$version"
             echo "build=$GITHUB_RUN_NUMBER"
             echo "channel=$channel"
+            echo "commit_title=$commit_title"
           } >> "$GITHUB_OUTPUT"
           echo "Etiqueta: $tag · versión $version ($GITHUB_RUN_NUMBER) · canal $channel"
+          echo "Título del commit: $commit_title"
 
       - name: Generar el proyecto con XcodeGen
         run: |
@@ -272,6 +275,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
           BUILD_NUMBER: ${{ steps.version.outputs.build }}
           CHANNEL: ${{ steps.version.outputs.channel }}
+          COMMIT_TITLE: ${{ steps.version.outputs.commit_title }}
         run: |
           set -euo pipefail
           base=$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.html_url' 2>/dev/null || true)
@@ -289,6 +293,7 @@ jobs:
             --channel "$CHANNEL" \
             --branch "$GITHUB_REF_NAME" \
             --sha "$GITHUB_SHA" \
+            --commit-title "$COMMIT_TITLE" \
             --icon App/Assets.xcassets/AppIcon.appiconset/AppIcon.png \
             --app-name "$APP_NAME" \
             --bundle-id "$APP_BUNDLE_ID" \
