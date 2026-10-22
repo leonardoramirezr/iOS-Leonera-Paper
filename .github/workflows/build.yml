@@ -138,6 +138,7 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
           VERSION: ${{ steps.version.outputs.version }}
           BUILD_NUMBER: ${{ steps.version.outputs.build }}
+          BUILD_TAG: ${{ steps.version.outputs.tag }}
         run: |
           set -o pipefail
           beautify() { if command -v xcbeautify >/dev/null 2>&1; then xcbeautify --renderer github-actions; else cat; fi; }
@@ -168,6 +169,7 @@ jobs:
               MARKETING_VERSION="$VERSION" \
               CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
               GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID" \
+              LP_BUILD_TAG="$BUILD_TAG" \
               2>&1 | tee -a "$log" | beautify
           }
           if archive; then exit 0; fi
@@ -228,6 +230,7 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
           VERSION: ${{ steps.version.outputs.version }}
           BUILD_NUMBER: ${{ steps.version.outputs.build }}
+          BUILD_TAG: ${{ steps.version.outputs.tag }}
         run: |
           set -euo pipefail
           beautify() { if command -v xcbeautify >/dev/null 2>&1; then xcbeautify --renderer github-actions; else cat; fi; }
@@ -246,6 +249,7 @@ jobs:
             MARKETING_VERSION="$VERSION" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
             GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID" \
+            LP_BUILD_TAG="$BUILD_TAG" \
             2>&1 | tee "$RUNNER_TEMP/xcodebuild-archive.log" | beautify
           app=$(find "$RUNNER_TEMP/LeoneraPaper.xcarchive/Products/Applications" -maxdepth 1 -name '*.app' | head -n 1)
           mkdir -p "$RUNNER_TEMP/unsigned/Payload" dist
