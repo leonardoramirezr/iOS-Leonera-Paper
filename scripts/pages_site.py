@@ -34,6 +34,7 @@ h1 { font-size:28px; margin:0; } h2 { font-size:18px; margin:32px 0 12px; }
 .row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-top:1px solid var(--line); }
 .row:first-child { border-top:0; }
 .row a.title { color:var(--text); font-weight:600; text-decoration:none; }
+.subject { margin-top:2px; overflow-wrap:anywhere; }
 dl { display:grid; grid-template-columns:max-content 1fr; gap:6px 16px; margin:0; }
 dt { color:var(--muted); } dd { margin:0; word-break:break-all; }
 a { color:var(--accent); }
@@ -109,6 +110,7 @@ def command_build(args: argparse.Namespace) -> None:
         "channel": args.channel,
         "branch": args.branch,
         "sha": args.sha,
+        "commit_title": args.commit_title,
         "created": created,
         "app_name": args.app_name,
         "bundle_id": args.bundle_id,
@@ -126,6 +128,7 @@ def command_build(args: argparse.Namespace) -> None:
     channel = "Versión estable" if args.channel == "stable" else "Pre-release"
     commit_url = f"https://github.com/{args.repo}/commit/{args.sha}"
     run = f'<dt>Ejecución</dt><dd><a href="{esc(args.run_url)}">GitHub Actions</a></dd>' if args.run_url else ""
+    subject = f"<dt>Commit</dt><dd>{esc(args.commit_title)}</dd>" if args.commit_title else ""
     body = f"""
 <header>
   <img src="icon-512.png" alt="">
@@ -137,7 +140,8 @@ def command_build(args: argparse.Namespace) -> None:
   <dt>Etiqueta</dt><dd>{esc(args.tag)}</dd>
   <dt>Versión</dt><dd>{esc(args.version)} ({esc(args.build)})</dd>
   <dt>Rama</dt><dd>{esc(args.branch)}</dd>
-  <dt>Commit</dt><dd><a href="{esc(commit_url)}"><code>{esc(args.sha[:7])}</code></a></dd>
+  {subject}
+  <dt>SHA</dt><dd><a href="{esc(commit_url)}"><code>{esc(args.sha[:7])}</code></a></dd>
   <dt>Fecha</dt><dd>{esc(format_date(created))}</dd>
   <dt>IPA</dt><dd><a href="{esc(args.ipa)}">{esc(args.ipa)}</a></dd>
   {run}
@@ -184,7 +188,7 @@ def command_index(args: argparse.Namespace) -> None:
             meta = f"{esc(build.get('version', ''))} ({esc(build.get('build', ''))}) · {esc(build.get('branch', ''))} · " \
                    f"<code>{esc(str(build.get('sha', ''))[:7])}</code> · {esc(format_date(str(build.get('created', ''))))}"
             result.append(f"""<div class="row">
-  <div><a class="title" href="{esc(build['_dir'])}/">{esc(build['_dir'])}</a><div class="muted">{meta}</div></div>
+  <div><a class="title" href="{esc(build['_dir'])}/">{esc(build['_dir'])}</a><div class="subject">{esc(build.get('commit_title', ''))}</div><div class="muted">{meta}</div></div>
   <a class="button small" href="{esc(install_link(manifest_for(build)))}">Instalar</a>
 </div>""")
         return '<div class="card">' + "\n".join(result) + "</div>"
@@ -223,6 +227,7 @@ def main() -> None:
                  "app-name", "bundle-id", "repo"):
         build.add_argument(f"--{name}", required=True)
     build.add_argument("--run-url", default="")
+    build.add_argument("--commit-title", default="")
 
     index = sub.add_parser("index")
     index.add_argument("--site", required=True)
