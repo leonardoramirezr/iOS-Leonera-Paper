@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import UIKit.UIGestureRecognizerSubclass
 
 /// UITextView de solo lectura con selección. El menú de edición del sistema se
 /// suprime: en su lugar se muestra el botón de resaltar y el panel del diccionario.
@@ -9,6 +10,28 @@ final class ReaderUITextView: UITextView {
     }
 
     private var lastFocusReclaim = Date.distantPast
+
+    /// Se llama al tocar una de las asas de la selección (para ampliarla o reducirla).
+    private var onSelectionHandleTouch: (() -> Void)?
+
+    func observeSelectionHandleTouches(_ handler: @escaping () -> Void) {
+        onSelectionHandleTouch = handler
+        addGestureRecognizer(TouchDownRecognizer { [weak self] location in
+            self?.touchDidBegin(at: location)
+        })
+    }
+
+    /// Las asas son vistas privadas del sistema: se detecta el toque cerca de los extremos
+    /// de la selección, donde el sistema las dibuja.
+    private func touchDidBegin(at location: CGPoint) {
+        guard selectedRange.length > 0, let range = selectedTextRange else { return }
+        let hitArea: (UITextPosition) -> CGRect = { [self] position in
+            caretRect(for: position).insetBy(dx: -22, dy: -22)
+        }
+        if hitArea(range.start).contains(location) || hitArea(range.end).contains(location) {
+            onSelectionHandleTouch?()
+        }
+    }
 
     /// Al aparecer, el diccionario del sistema toma el foco y la selección (con sus
     /// asas para ampliarla) deja de dibujarse. Si el foco se lo ha llevado el
@@ -78,6 +101,7 @@ struct ReaderTextView: UIViewRepresentable {
         textView.layoutManager.allowsNonContiguousLayout = false
         textView.keyboardDismissMode = .none
         textView.delegate = context.coordinator
+        textView.observeSelectionHandleTouches { [weak model] in model?.dismissDictionary() }
         model.textView = textView
         return textView
     }
@@ -145,6 +169,32 @@ struct ReaderTextView: UIViewRepresentable {
             // Menú vacío: no se muestra el menú del sistema.
             UIMenu(children: [])
         }
+    }
+}
+
+/// Avisa del inicio de cada toque sin reconocer nada ni interferir con los demás gestos.
+private final class TouchDownRecognizer: UIGestureRecognizer, UIGestureRecognizerDelegate {
+    private let handler: (CGPoint) -> Void
+
+    init(handler: @escaping (CGPoint) -> Void) {
+        self.handler = handler
+        super.init(target: nil, action: nil)
+        cancelsTouchesInView = false
+        delaysTouchesBegan = false
+        delaysTouchesEnded = false
+        delegate = self
+    }
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+        if let touch = touches.first, let view {
+            handler(touch.location(in: view))
+        }
+        state = .failed
+    }
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
+        true
     }
 }
 
