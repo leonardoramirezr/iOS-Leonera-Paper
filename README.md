@@ -38,7 +38,7 @@ como Markdown, leerlos con varios estilos, resaltarlos y consultar el diccionari
   Cloudflare and others) write a *Main takeaways* summary. The video is saved as an
   article in the list: its thumbnail, channel, length and the first lines of the
   summary show in the list, and the article holds the summary. When you paste a
-  YouTube link you choose its size (short, the default, medium or long). The
+  YouTube link you choose its size (short, medium by default, or long). The
   transcript is not saved. See [YouTube summaries](#youtube-summaries).
 - **Almacenamiento local** en *Archivos › En mi iPhone › Leonera Paper*: una carpeta
   por artículo con `<artículo>.md` (con *front matter* YAML), `images/` y, si viene

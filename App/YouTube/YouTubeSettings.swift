@@ -23,7 +23,7 @@ final class YouTubeSettings {
         }
     }
 
-    /// How long the summary of a video is. It is chosen for each link; short by default.
+    /// How long the summary of a video is. It is chosen for each link; medium by default.
     enum SummaryLength: String, CaseIterable, Identifiable, Sendable {
         case short, medium, long
 

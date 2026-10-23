@@ -8,7 +8,7 @@ struct AddArticleView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var text = ""
     @State private var showsPDFPicker = false
-    @State private var summaryLength = YouTubeSettings.SummaryLength.short
+    @State private var summaryLength = YouTubeSettings.SummaryLength.medium
     @FocusState private var focused: Bool
 
     var body: some View {

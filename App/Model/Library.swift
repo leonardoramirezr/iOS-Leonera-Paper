@@ -12,7 +12,7 @@ final class Library {
         var status: String
         var error: String?
         /// Size of the summary when the link is a YouTube video.
-        var summaryLength = YouTubeSettings.SummaryLength.short
+        var summaryLength = YouTubeSettings.SummaryLength.medium
 
         var displayName: String {
             if YouTubeLink.isVideo(url) { return "Vídeo de YouTube" }
@@ -84,7 +84,7 @@ final class Library {
 
     // MARK: - Importación
 
-    func importArticle(from url: URL, summaryLength: YouTubeSettings.SummaryLength = .short) {
+    func importArticle(from url: URL, summaryLength: YouTubeSettings.SummaryLength = .medium) {
         let url = YouTubeLink.canonicalURL(for: url) ?? url
         guard !jobs.contains(where: { $0.url == url && $0.error == nil }) else { return }
         if !url.isFileURL, let existing = articles.first(where: { $0.sourceURL == url }) {
