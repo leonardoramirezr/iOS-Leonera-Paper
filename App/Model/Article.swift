@@ -24,8 +24,11 @@ struct Article: Identifiable, Codable, Hashable {
     var videoID: String? = nil
     /// Length of the video in seconds.
     var videoDuration: Int? = nil
+    /// When the article was archived. Nil while it stays in the main list.
+    var archivedAt: Date? = nil
 
     var isYouTubeVideo: Bool { videoID != nil }
+    var isArchived: Bool { archivedAt != nil }
 
     var displaySite: String {
         if let siteName, !siteName.isEmpty { return siteName }

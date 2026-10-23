@@ -11,6 +11,7 @@ struct LibraryView: View {
     @State private var search = ""
     @State private var showsAdd = false
     @State private var showsSettings = false
+    @State private var showsArchive = false
     @State private var previewURL: URL?
     @State private var renaming: Article?
 
@@ -30,12 +31,20 @@ struct LibraryView: View {
                             ArticleRow(article: article, imageFolder: library.folderURL(for: article))
                         }
                         .contextMenu { menu(for: article) }
-                        .swipeActions(edge: .trailing) {
+                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 library.delete(article)
                             } label: {
                                 Label("Eliminar", systemImage: "trash")
                             }
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button {
+                                library.setArchived(article, true)
+                            } label: {
+                                Label("Archivar", systemImage: "archivebox")
+                            }
+                            .tint(.orange)
                         }
                     }
                 }
@@ -59,6 +68,14 @@ struct LibraryView: View {
                     }
                     .accessibilityLabel("Ajustes")
                 }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showsArchive = true
+                    } label: {
+                        Image(systemName: "archivebox")
+                    }
+                    .accessibilityLabel("Archivo")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showsAdd = true
@@ -69,7 +86,7 @@ struct LibraryView: View {
                 }
             }
             .overlay {
-                if library.articles.isEmpty && library.jobs.isEmpty {
+                if library.activeArticles.isEmpty && library.jobs.isEmpty {
                     ContentUnavailableView {
                         Label("Sin artículos", systemImage: "doc.richtext")
                     } description: {
@@ -97,6 +114,9 @@ struct LibraryView: View {
             .sheet(isPresented: $showsSettings) {
                 SettingsView()
             }
+            .sheet(isPresented: $showsArchive) {
+                ArchiveView()
+            }
             .sheet(item: $renaming) { article in
                 RenameArticleView(article: article)
             }
@@ -106,8 +126,8 @@ struct LibraryView: View {
 
     private var filteredArticles: [Article] {
         let query = search.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else { return library.articles }
-        return library.articles.filter { article in
+        guard !query.isEmpty else { return library.activeArticles }
+        return library.activeArticles.filter { article in
             article.title.localizedCaseInsensitiveContains(query)
                 || article.displaySite.localizedCaseInsensitiveContains(query)
                 || (article.isYouTubeVideo && article.author?.localizedCaseInsensitiveContains(query) == true)
@@ -151,6 +171,11 @@ struct LibraryView: View {
                       systemImage: "icloud.and.arrow.up")
             }
         }
+        Button {
+            library.setArchived(article, true)
+        } label: {
+            Label("Archivar", systemImage: "archivebox")
+        }
         Button(role: .destructive) {
             library.delete(article)
         } label: {
@@ -159,7 +184,7 @@ struct LibraryView: View {
     }
 }
 
-private struct ArticleRow: View {
+struct ArticleRow: View {
     let article: Article
     let imageFolder: URL
 
