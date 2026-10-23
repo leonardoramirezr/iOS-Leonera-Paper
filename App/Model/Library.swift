@@ -38,6 +38,15 @@ final class Library {
         articles.first { $0.id == id }
     }
 
+    /// Articles shown in the main list (everything not archived).
+    var activeArticles: [Article] {
+        articles.filter { !$0.isArchived }
+    }
+
+    var archivedArticles: [Article] {
+        articles.filter(\.isArchived)
+    }
+
     func markdownURL(for article: Article) -> URL {
         storage.markdownURL(for: article)
     }
@@ -156,6 +165,16 @@ final class Library {
         try? FileManager.default.removeItem(at: storage.folderURL(for: article))
         articles.removeAll { $0.id == article.id }
         persist()
+    }
+
+    /// Moves an article to or from the archive. Nothing is removed from disk.
+    func setArchived(_ article: Article, _ archived: Bool) {
+        guard let index = articles.firstIndex(where: { $0.id == article.id }) else { return }
+        articles[index].archivedAt = archived ? Date() : nil
+        persist()
+        if archived {
+            notice = "«\(article.title)» archivado."
+        }
     }
 
     /// Cambia el título que se ve en la biblioteca y el del Markdown guardado. La carpeta
