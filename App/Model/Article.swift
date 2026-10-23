@@ -20,6 +20,12 @@ struct Article: Identifiable, Codable, Hashable {
     var drive: DriveInfo?
     /// PDF original (dentro de la carpeta) si el artículo se convirtió desde un PDF.
     var pdfFileName: String? = nil
+    /// YouTube video ID when the article is the summary of a video.
+    var videoID: String? = nil
+    /// Length of the video in seconds.
+    var videoDuration: Int? = nil
+
+    var isYouTubeVideo: Bool { videoID != nil }
 
     var displaySite: String {
         if let siteName, !siteName.isEmpty { return siteName }

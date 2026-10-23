@@ -32,6 +32,13 @@ como Markdown, leerlos con varios estilos, resaltarlos y consultar el diccionari
   Medium, Substack… Al pegar la URL (botón **+** de esa pestaña) se obtienen el
   título y el icono de la página, editables antes de guardar. Se muestran en una
   lista con el icono a la izquierda y el título a la derecha; tocar uno lo abre.
+- **YouTube video summaries**: paste a YouTube link (**+** button) or share it from
+  the YouTube app or Safari. The app downloads the audio, transcribes it with Whisper
+  on Groq and has Gemini write a *Main takeaways* summary. The video is saved as an
+  article in the list: its thumbnail, channel, length and the first lines of the
+  summary show in the list, and the article holds the summary followed by the
+  transcript, with links to each minute of the video. See
+  [YouTube summaries](#youtube-summaries).
 - **Almacenamiento local** en *Archivos › En mi iPhone › Leonera Paper*: una carpeta
   por artículo con `<artículo>.md` (con *front matter* YAML), `images/` y, si viene
   de un PDF, `<artículo>.pdf`.
@@ -74,6 +81,43 @@ Oxford no ofrece una API gratuita, así que hay dos modos:
 3. Pulsa *Conectar con Google Drive*. La app usa el alcance `drive.file`: solo ve
    los archivos que crea.
 
+### YouTube summaries
+
+1. Create an API key for [Groq](https://console.groq.com/keys) and one for
+   [Gemini](https://aistudio.google.com/apikey).
+2. Enter them in *Ajustes › Resúmenes de YouTube*. They are stored in the iPhone
+   keychain and never go into the build: the IPA is public on GitHub Pages.
+3. Optional settings in the same section: the Whisper model
+   (`whisper-large-v3-turbo` by default, or `whisper-large-v3`), the Gemini model
+   (`gemini-3.8-flash` by default) and the summary language (the video's language by
+   default, Spanish or English).
+
+How an import works (`App/YouTube/`):
+
+1. `YouTubeLink` recognizes `watch?v=`, `youtu.be/`, `/shorts/`, `/live/` and
+   `/embed/` links and normalizes them, so the same video is not saved twice.
+2. `YouTubeClient` asks YouTube's InnerTube player API for the video with the same
+   clients yt-dlp uses without JavaScript (`VISIONOS`, then `ANDROID_VR`), whose stream
+   URLs need no signature deciphering or PO token. It downloads the smallest AAC
+   audio-only stream in 5 MB ranges. If YouTube refuses every audio stream, it
+   downloads the video with sound instead and uses its audio track. When YouTube
+   changes its clients, update the values in `YouTubeClient.clients` from
+   `yt_dlp/extractor/youtube/_base.py`.
+3. `AudioChunker` converts the audio to 16 kHz mono AAC with AVFoundation and splits
+   it into 30-minute parts, which stay under Groq's 25 MB upload limit.
+4. `GroqTranscriber` sends each part to `/openai/v1/audio/transcriptions`
+   (`verbose_json`, for the segment times).
+5. `GeminiSummarizer` sends the transcript to Gemini's OpenAI-compatible endpoint
+   (`/v1beta/openai/chat/completions`) and asks for an overview sentence followed by a
+   numbered `## Main takeaways` list.
+6. `YouTubeImporter` writes the Markdown file: front matter, title, channel, link and
+   length, thumbnail, summary and the transcript under *Transcripción*, in paragraphs of
+   about a minute that start with a link to that moment of the video.
+
+The video data, the audio and the transcript are kept in `Caches/YouTube/<id>/` until
+the article is saved. If a step fails (for example, a missing Gemini key), *Reintentar*
+resumes from that step without downloading or transcribing again.
+
 ## Estructura
 
 | Ruta | Contenido |
@@ -81,6 +125,7 @@ Oxford no ofrece una API gratuita, así que hay dos modos:
 | `project.yml` | Proyecto de [XcodeGen](https://github.com/yonaskolb/XcodeGen) (app + extensión de compartir). |
 | `App/` | App SwiftUI: biblioteca, importación (web y PDF), lector, diccionario y Google Drive. |
 | `App/Markdown/` | Intérprete de Markdown con mapa de posiciones (para escribir `==…==` en el sitio exacto). |
+| `App/YouTube/` | YouTube summaries: audio download, conversion, Whisper transcription (Groq) and summary (Gemini). |
 | `ShareExtension/` | Extensión «Compartir» de Safari. |
 | `Shared/` | Código común: cola de enlaces pendientes en un grupo de llavero. |
 | `Config/` | `Info.plist` y entitlements. |

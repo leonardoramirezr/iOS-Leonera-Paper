@@ -5,6 +5,7 @@ struct SettingsView: View {
     @Environment(DriveSync.self) private var drive
     @Environment(DictionaryService.self) private var dictionary
     @Environment(ReaderPreferences.self) private var preferences
+    @Environment(YouTubeSettings.self) private var youtube
     @Environment(\.dismiss) private var dismiss
     @State private var connecting = false
 
@@ -12,6 +13,7 @@ struct SettingsView: View {
         @Bindable var drive = drive
         @Bindable var dictionary = dictionary
         @Bindable var preferences = preferences
+        @Bindable var youtube = youtube
 
         NavigationStack {
             Form {
@@ -47,6 +49,32 @@ struct SettingsView: View {
                     Text("Diccionario")
                 } footer: {
                     Text("«Automático» busca en Oxford English–Spanish y, si la palabra no está, en Oxford Dictionary of English. Con App ID y App Key de la Oxford Dictionaries API (developer.oxforddictionaries.com) la definición se muestra directamente; sin ellas se usan los diccionarios Oxford de iOS (Ajustes › General › Diccionario: «Español – Inglés» y «Inglés (Reino Unido)»).")
+                }
+
+                Section {
+                    SecureField("Clave de la API de Groq", text: $youtube.groqAPIKey)
+                    Picker("Modelo de Whisper", selection: $youtube.transcriptionModel) {
+                        ForEach(YouTubeSettings.transcriptionModels, id: \.self) { model in
+                            Text(model).tag(model)
+                        }
+                    }
+                    SecureField("Clave de la API de Gemini", text: $youtube.geminiAPIKey)
+                    LabeledContent("Modelo de Gemini") {
+                        TextField("Modelo de Gemini", text: $youtube.summaryModel,
+                                  prompt: Text(YouTubeSettings.defaultSummaryModel))
+                            .multilineTextAlignment(.trailing)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                    }
+                    Picker("Idioma del resumen", selection: $youtube.summaryLanguage) {
+                        ForEach(YouTubeSettings.SummaryLanguage.allCases) { language in
+                            Text(language.title).tag(language)
+                        }
+                    }
+                } header: {
+                    Text("Resúmenes de YouTube")
+                } footer: {
+                    Text("Al guardar un enlace de YouTube se descarga el audio, Whisper lo transcribe en Groq y Gemini escribe un resumen «Main takeaways», que aparece en la lista de artículos con la transcripción debajo. Crea las claves en console.groq.com/keys y aistudio.google.com/apikey; se guardan en el llavero del iPhone.")
                 }
 
                 Section {
