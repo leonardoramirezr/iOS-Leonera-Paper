@@ -38,11 +38,6 @@ enum YouTubeLink {
         URL(string: "https://www.youtube.com/watch?v=\(id)")!
     }
 
-    /// Link that opens the video at `seconds`.
-    static func watchURL(for id: String, at seconds: Int) -> String {
-        "https://www.youtube.com/watch?v=\(id)&t=\(max(0, seconds))s"
-    }
-
     /// «1:02:03» or «2:03».
     static func formatDuration(_ seconds: Int) -> String {
         let hours = seconds / 3600
