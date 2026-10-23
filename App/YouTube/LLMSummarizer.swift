@@ -37,11 +37,12 @@ enum LLMSummarizer {
     }
 
     static func summarize(_ transcript: String, title: String, channel: String?,
-                          language: YouTubeSettings.SummaryLanguage, connection: LLMConnection) async throws -> VideoSummary {
+                          language: YouTubeSettings.SummaryLanguage, summaryLength: YouTubeSettings.SummaryLength,
+                          connection: LLMConnection) async throws -> VideoSummary {
         var details = "Title: \(title)\n"
         if let channel, !channel.isEmpty { details += "Channel: \(channel)\n" }
         let data = try await post([
-            Message(role: "system", content: instructions(language: language)),
+            Message(role: "system", content: instructions(language: language, summaryLength: summaryLength)),
             Message(role: "user", content: "\(details)\nTranscript:\n\(transcript)"),
         ], connection: connection, timeout: 300)
         let response = try JSONDecoder().decode(ChatResponse.self, from: data)
@@ -73,12 +74,19 @@ enum LLMSummarizer {
                                         service: connection.provider.name, retries: retries)
     }
 
-    private static func instructions(language: YouTubeSettings.SummaryLanguage) -> String {
+    private static func instructions(language: YouTubeSettings.SummaryLanguage,
+                                     summaryLength: YouTubeSettings.SummaryLength) -> String {
         let target: String
         switch language {
         case .video: target = "the same language as the transcript"
         case .spanish: target = "Spanish"
         case .english: target = "English"
+        }
+        let size: String
+        switch summaryLength {
+        case .short: size = "Between 3 and 5 takeaways. Each explanation is one sentence."
+        case .medium: size = "Between 5 and 10 takeaways. Each explanation is one to three sentences."
+        case .long: size = "Between 10 and 15 takeaways. Each explanation is three to five sentences with the supporting details."
         }
         return """
         You summarize YouTube videos from their automatic transcript. Write a "Main takeaways" \
@@ -88,12 +96,12 @@ enum LLMSummarizer {
 
         \(heading)
 
-        1. **<The takeaway in a few words>.** <One to three sentences that explain it with the \
-        concrete facts, figures, examples or arguments given in the video.>
+        1. **<The takeaway in a few words>.** <The explanation, with the concrete facts, figures, \
+        examples or arguments given in the video.>
         2. …
 
         Rules:
-        - Between 5 and 10 takeaways, the most important first. Fewer if the video is short.
+        - \(size) The most important first. Use fewer if the video is too short for that many.
         - Use only what is said in the video; do not add outside facts or opinions.
         - The transcript may misspell names and terms; write them correctly when the context makes them clear.
         - No title, no introduction such as "Here is the summary" and no closing remarks.

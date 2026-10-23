@@ -37,9 +37,9 @@ como Markdown, leerlos con varios estilos, resaltarlos y consultar el diccionari
   on Groq and has the LLM provider you choose (Gemini, Claude, OpenAI, Groq, NVIDIA,
   Cloudflare and others) write a *Main takeaways* summary. The video is saved as an
   article in the list: its thumbnail, channel, length and the first lines of the
-  summary show in the list, and the article holds the summary followed by the
-  transcript, with links to each minute of the video. See
-  [YouTube summaries](#youtube-summaries).
+  summary show in the list, and the article holds the summary. When you paste a
+  YouTube link you choose its size (short, the default, medium or long). The
+  transcript is not saved. See [YouTube summaries](#youtube-summaries).
 - **Almacenamiento local** en *Archivos › En mi iPhone › Leonera Paper*: una carpeta
   por artículo con `<artículo>.md` (con *front matter* YAML), `images/` y, si viene
   de un PDF, `<artículo>.pdf`.
@@ -136,14 +136,16 @@ How an import works (`App/YouTube/`):
    (`verbose_json`, for the segment times).
 5. `LLMSummarizer` sends the transcript to the chat completions endpoint of the chosen
    provider and asks for an overview sentence followed by a numbered `## Main takeaways`
-   list. `LLMProvider` holds each provider's base URL and default model.
+   list. The size chosen in *Añadir artículo* sets the number of takeaways: short 3–5
+   with one sentence each, medium 5–10 with one to three sentences, long 10–15 with
+   three to five. `LLMProvider` holds each provider's base URL and default model.
 6. `YouTubeImporter` writes the Markdown file: front matter, title, channel, link and
-   length, thumbnail, summary and the transcript under *Transcripción*, in paragraphs of
-   about a minute that start with a link to that moment of the video.
+   length, thumbnail and summary. The transcript is not written to the article.
 
 The video data, the audio and the transcript are kept in `Caches/YouTube/<id>/` until
-the article is saved. If a step fails (for example, a missing key), *Reintentar*
-resumes from that step without downloading or transcribing again.
+the article is saved, and the transcript is deleted with them. If a step fails (for
+example, a missing key), *Reintentar* resumes from that step without downloading or
+transcribing again, and keeps the size chosen for the link.
 
 ## Estructura
 

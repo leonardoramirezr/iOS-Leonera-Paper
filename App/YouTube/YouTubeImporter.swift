@@ -20,11 +20,12 @@ enum YouTubeImportError: LocalizedError {
 }
 
 /// Saves a YouTube video as an article: downloads its audio, transcribes it with Whisper
-/// (Groq), summarizes it with the chosen LLM provider and writes a Markdown file with the summary
-/// followed by the transcript.
+/// (Groq), summarizes it with the chosen LLM provider and writes a Markdown file with the summary.
+/// The transcript stays in the work folder until the article is saved.
 @MainActor
 enum YouTubeImporter {
-    static func importVideo(id videoID: String, settings: YouTubeSettings.Configuration, storage: ArticleStorage,
+    static func importVideo(id videoID: String, settings: YouTubeSettings.Configuration,
+                            summaryLength: YouTubeSettings.SummaryLength, storage: ArticleStorage,
                             progress: @escaping @MainActor (String) -> Void) async throws -> Article {
         guard !settings.groqAPIKey.isEmpty else { throw YouTubeImportError.missingGroqKey }
         guard let llm = settings.summary else { throw YouTubeImportError.incompleteSummarySettings }
@@ -62,14 +63,15 @@ enum YouTubeImporter {
 
         progress("Resumiendo con \(llm.provider.name)…")
         let summary = try await LLMSummarizer.summarize(transcript.text, title: info.title, channel: info.channel,
-                                                        language: settings.summaryLanguage, connection: llm)
+                                                        language: settings.summaryLanguage, summaryLength: summaryLength,
+                                                        connection: llm)
 
         progress("Guardando Markdown…")
         let folder = try storage.makeFolder(for: info.title)
         do {
             let leadImage = await saveThumbnail(of: info, in: storage.imagesURL(inFolder: folder.url))
             let savedAt = Date()
-            let markdown = compose(info: info, summary: summary, transcript: transcript, leadImage: leadImage,
+            let markdown = compose(info: info, summary: summary, leadImage: leadImage,
                                    settings: settings, savedAt: savedAt)
             let fileName = "\(folder.name).md"
             try markdown.write(to: folder.url.appendingPathComponent(fileName), atomically: true, encoding: .utf8)
@@ -168,7 +170,7 @@ enum YouTubeImporter {
 
     // MARK: - Markdown
 
-    static func compose(info: YouTubeVideoInfo, summary: VideoSummary, transcript: Transcript, leadImage: String?,
+    static func compose(info: YouTubeVideoInfo, summary: VideoSummary, leadImage: String?,
                         settings: YouTubeSettings.Configuration, savedAt: Date) -> String {
         let yaml = ArticleImporter.yaml
         let escape = ArticleImporter.escape
@@ -190,34 +192,7 @@ enum YouTubeImporter {
         var parts = [front.joined(separator: "\n"), "# \(escape(info.title))", "*\(meta.joined(separator: " · "))*"]
         if let leadImage { parts.append("![\(escape(info.title))](\(leadImage))") }
         parts.append(summary.markdown)
-        parts.append("## Transcripción")
-        parts.append(contentsOf: transcriptParagraphs(transcript, videoID: info.id))
         return parts.joined(separator: "\n\n") + "\n"
-    }
-
-    /// Groups the segments into paragraphs of about a minute, each starting with a link to that
-    /// moment of the video. Without segments the whole text is one paragraph.
-    private static func transcriptParagraphs(_ transcript: Transcript, videoID: String) -> [String] {
-        guard !transcript.segments.isEmpty else { return [ArticleImporter.escape(transcript.text)] }
-        var paragraphs: [String] = []
-        var current: [String] = []
-        var start = transcript.segments[0].start
-        func flush() {
-            guard !current.isEmpty else { return }
-            let seconds = Int(start)
-            let link = "[\(YouTubeLink.formatDuration(seconds))](\(YouTubeLink.watchURL(for: videoID, at: seconds)))"
-            paragraphs.append("\(link) \(ArticleImporter.escape(current.joined(separator: " ")))")
-            current = []
-        }
-        for segment in transcript.segments {
-            if current.isEmpty { start = segment.start }
-            current.append(segment.text)
-            let elapsed = segment.end - start
-            let endsSentence = segment.text.last.map { ".?!…".contains($0) } ?? false
-            if (elapsed >= 60 && endsSentence) || elapsed >= 120 { flush() }
-        }
-        flush()
-        return paragraphs
     }
 
     // MARK: - Work files

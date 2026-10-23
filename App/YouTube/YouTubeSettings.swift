@@ -23,6 +23,21 @@ final class YouTubeSettings {
         }
     }
 
+    /// How long the summary of a video is. It is chosen for each link; short by default.
+    enum SummaryLength: String, CaseIterable, Identifiable, Sendable {
+        case short, medium, long
+
+        var id: String { rawValue }
+
+        var title: String {
+            switch self {
+            case .short: return "Corto"
+            case .medium: return "Mediano"
+            case .long: return "Largo"
+            }
+        }
+    }
+
     /// Values read when an import starts.
     struct Configuration: Sendable {
         var groqAPIKey = ""

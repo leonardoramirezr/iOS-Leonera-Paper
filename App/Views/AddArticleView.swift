@@ -8,6 +8,7 @@ struct AddArticleView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var text = ""
     @State private var showsPDFPicker = false
+    @State private var summaryLength = YouTubeSettings.SummaryLength.short
     @FocusState private var focused: Bool
 
     var body: some View {
@@ -35,6 +36,18 @@ struct AddArticleView: View {
                                   systemImage: "key")
                                 .font(.footnote)
                                 .foregroundStyle(.orange)
+                        }
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Tamaño del resumen")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                            Picker("Tamaño del resumen", selection: $summaryLength) {
+                                ForEach(YouTubeSettings.SummaryLength.allCases) { length in
+                                    Text(length.title).tag(length)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                            .labelsHidden()
                         }
                     }
                 } footer: {
@@ -85,7 +98,7 @@ struct AddArticleView: View {
 
     private func save() {
         guard let url else { return }
-        library.importArticle(from: url)
+        library.importArticle(from: url, summaryLength: summaryLength)
         dismiss()
     }
 }

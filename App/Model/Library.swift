@@ -11,6 +11,8 @@ final class Library {
         let url: URL
         var status: String
         var error: String?
+        /// Size of the summary when the link is a YouTube video.
+        var summaryLength = YouTubeSettings.SummaryLength.short
 
         var displayName: String {
             if YouTubeLink.isVideo(url) { return "Vídeo de YouTube" }
@@ -82,7 +84,7 @@ final class Library {
 
     // MARK: - Importación
 
-    func importArticle(from url: URL) {
+    func importArticle(from url: URL, summaryLength: YouTubeSettings.SummaryLength = .short) {
         let url = YouTubeLink.canonicalURL(for: url) ?? url
         guard !jobs.contains(where: { $0.url == url && $0.error == nil }) else { return }
         if !url.isFileURL, let existing = articles.first(where: { $0.sourceURL == url }) {
@@ -90,14 +92,14 @@ final class Library {
             return
         }
         jobs.removeAll { $0.url == url }
-        let job = ImportJob(url: url, status: "Preparando…")
+        let job = ImportJob(url: url, status: "Preparando…", summaryLength: summaryLength)
         jobs.append(job)
-        Task { await runImport(jobID: job.id, url: url) }
+        Task { await runImport(jobID: job.id, url: url, summaryLength: summaryLength) }
     }
 
     func retry(_ job: ImportJob) {
         jobs.removeAll { $0.id == job.id }
-        importArticle(from: job.url)
+        importArticle(from: job.url, summaryLength: job.summaryLength)
     }
 
     func dismiss(_ job: ImportJob) {
@@ -106,7 +108,7 @@ final class Library {
         YouTubeImporter.discardWorkFiles(for: job.url)
     }
 
-    private func runImport(jobID: UUID, url: URL) async {
+    private func runImport(jobID: UUID, url: URL, summaryLength: YouTubeSettings.SummaryLength) async {
         let update: @MainActor (String) -> Void = { [weak self] status in
             guard let self, let index = self.jobs.firstIndex(where: { $0.id == jobID }) else { return }
             self.jobs[index].status = status
@@ -119,6 +121,7 @@ final class Library {
             } else if let videoID = YouTubeLink.videoID(from: url) {
                 article = try await YouTubeImporter.importVideo(id: videoID,
                                                                 settings: youtube?.configuration ?? YouTubeSettings.Configuration(),
+                                                                summaryLength: summaryLength,
                                                                 storage: storage, progress: update)
             } else {
                 article = try await ArticleImporter.importArticle(from: url, storage: storage, progress: update)
