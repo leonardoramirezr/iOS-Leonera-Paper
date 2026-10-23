@@ -1,0 +1,18 @@
+{
+  "tag": "build-30-57f04c3",
+  "version": "0.12.30",
+  "build": "30",
+  "channel": "prerelease",
+  "branch": "claude/api-test-buttons-llm-providers-3offbx",
+  "sha": "57f04c3559cce0e71d722c3756a77ea6287208fd",
+  "commit_title": "YouTube: probar las claves de la API y elegir proveedor de LLM",
+  "created": "2026-10-23T18:11:55Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/40001028560",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-30-57f04c3/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-30-57f04c3/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-30-57f04c3%2Fmanifest.plist"
+}

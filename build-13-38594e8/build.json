@@ -1,0 +1,17 @@
+{
+  "tag": "build-13-38594e8",
+  "version": "0.4.13",
+  "build": "13",
+  "channel": "prerelease",
+  "branch": "claude/eliminar-boton-x-circulo-tzlur6",
+  "sha": "38594e8e35336a2037c3311269e40cd749652298",
+  "created": "2026-10-22T00:40:08Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/39700887803",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-13-38594e8/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-13-38594e8/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-13-38594e8%2Fmanifest.plist"
+}

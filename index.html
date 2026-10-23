@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leonera Paper</title>
+<style>
+:root { color-scheme: light dark; --bg:#f5f5f7; --card:#fff; --text:#1d1d1f; --muted:#6e6e73; --accent:#c26a00; --line:#e3e3e8; }
+@media (prefers-color-scheme: dark) { :root { --bg:#111418; --card:#1c2128; --text:#e6e6e9; --muted:#9a9aa3; --accent:#f0b43c; --line:#2d333b; } }
+* { box-sizing: border-box; }
+body { margin:0; font:16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:var(--bg); color:var(--text); }
+main { max-width:720px; margin:0 auto; padding:32px 16px 64px; }
+header { display:flex; align-items:center; gap:16px; margin-bottom:24px; }
+header img { width:72px; height:72px; border-radius:16px; box-shadow:0 2px 10px rgba(0,0,0,.15); }
+h1 { font-size:28px; margin:0; } h2 { font-size:18px; margin:32px 0 12px; }
+.muted { color:var(--muted); font-size:14px; }
+.button { display:inline-block; background:var(--accent); color:#fff; text-decoration:none; font-weight:600; padding:14px 22px; border-radius:14px; }
+.button.small { padding:8px 14px; border-radius:10px; font-size:14px; }
+.button.disabled { background:var(--line); color:var(--muted); pointer-events:none; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px; margin:12px 0; }
+.row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-top:1px solid var(--line); }
+.row:first-child { border-top:0; }
+.row a.title { color:var(--text); font-weight:600; text-decoration:none; }
+.subject { margin-top:2px; overflow-wrap:anywhere; }
+dl { display:grid; grid-template-columns:max-content 1fr; gap:6px 16px; margin:0; }
+dt { color:var(--muted); } dd { margin:0; word-break:break-all; }
+a { color:var(--accent); }
+code { font-size:13px; }
+</style>
+</head>
+<body><main>
+
+<header>
+  <img src="0.16.0/icon-512.png" alt="">
+  <div><h1>Leonera Paper</h1><div class="muted">Builds Ad Hoc de <a href="https://github.com/leonardoramirezr/iOS-Leonera-Paper">leonardoramirezr/iOS-Leonera-Paper</a></div></div>
+</header>
+<p><a class="button" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.16.0%2Fmanifest.plist">Instalar la última versión estable (0.16.0)</a></p>
+<p class="muted">Abre esta página en Safari en un iPhone registrado. Para añadir un iPhone, registra su UDID en Apple Developer y haz push: el siguiente build lo incluirá.</p>
+<h2>Versiones estables (main)</h2>
+<div class="card"><div class="row">
+  <div><a class="title" href="0.16.0/">0.16.0</a><div class="subject">Biblioteca: archivar artículos con el gesto y ver el archivo (#16)</div><div class="muted">0.16.0 (38) · main · <code>e68bb50</code> · 2026-10-23 22:32 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.16.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.15.0/">0.15.0</a><div class="subject">YouTube: elegir el tamaño del resumen y no guardar la transcripción (#15)</div><div class="muted">0.15.0 (36) · main · <code>462311d</code> · 2026-10-23 20:53 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.15.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.14.0/">0.14.0</a><div class="subject">YouTube: descubrir los modelos de cada proveedor de voz y de LLM (#14)</div><div class="muted">0.14.0 (33) · main · <code>41cc368</code> · 2026-10-23 20:21 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.14.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.13.0/">0.13.0</a><div class="subject">YouTube: probar las claves de la API y elegir proveedor de LLM (#13)</div><div class="muted">0.13.0 (31) · main · <code>c9aaa10</code> · 2026-10-23 18:16 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.13.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.12.0/">0.12.0</a><div class="subject">YouTube: guardar vídeos como resumen «Main takeaways» (Whisper en Groq + Gemini) (#12)</div><div class="muted">0.12.0 (29) · main · <code>005a6cb</code> · 2026-10-23 17:49 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.12.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.11.0/">0.11.0</a><div class="subject">Biblioteca: permitir cambiar el título de un artículo (#9)</div><div class="muted">0.11.0 (27) · main · <code>1a38b9a</code> · 2026-10-22 18:14 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.11.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.10.0/">0.10.0</a><div class="subject">Pages: mostrar el título del commit también en builds antiguos (#11)</div><div class="muted">0.10.0 (26) · main · <code>9e2019d</code> · 2026-10-22 18:00 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.10.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.9.0/">0.9.0</a><div class="subject">Ajustes: mostrar el nombre del build en «Acerca de» (#10)</div><div class="muted">0.9.0 (24) · main · <code>c892733</code> · 2026-10-22 17:57 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.9.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.8.0/">0.8.0</a><div class="subject">Icono: monograma «P» (papel, resaltar, leer, real) (#7)</div><div class="muted">0.8.0 (21) · main · <code>3230d9b</code> · 2026-10-22 17:51 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.8.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.7.0/">0.7.0</a><div class="subject">Pages: mostrar el título del commit en cada build (#8)</div><div class="muted">0.7.0 (19) · main · <code>0e63d94</code> · 2026-10-22 13:40 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.7.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.6.0/">0.6.0</a><div class="subject">Lector: cerrar el diccionario al tocar un asa de la selección (#6)</div><div class="muted">0.6.0 (16) · main · <code>f093f22</code> · 2026-10-22 01:00 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.6.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.5.0/">0.5.0</a><div class="subject">Diccionario: tapar el botón de cerrar del diccionario del sistema (#5)</div><div class="muted">0.5.0 (14) · main · <code>e5170c4</code> · 2026-10-22 00:47 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.5.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.4.0/">0.4.0</a><div class="subject">Lector: mantener la selección visible con el diccionario y arreglar el botón de cerrar (#4)</div><div class="muted">0.4.0 (10) · main · <code>33ed862</code> · 2026-10-21 23:35 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.4.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.3.0/">0.3.0</a><div class="subject">Añadir pestaña Blogs para guardar portadas de blogs y newsletters (#3)</div><div class="muted">0.3.0 (8) · main · <code>0bc3fdb</code> · 2026-10-14 19:25 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.3.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.2.0/">0.2.0</a><div class="subject">Importar PDF y convertirlos a Markdown (#2)</div><div class="muted">0.2.0 (6) · main · <code>baeb4ee</code> · 2026-10-14 15:49 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.2.0%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="0.1.0/">0.1.0</a><div class="subject">Leonera Paper: app SwiftUI, extensión de compartir y despliegue Ad Hoc en GitHub Pages (#1)</div><div class="muted">0.1.0 (3) · main · <code>e3249d4</code> · 2026-10-14 15:21 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.1.0%2Fmanifest.plist">Instalar</a>
+</div></div>
+<h2>Builds de otras ramas (últimos 20)</h2>
+<div class="card"><div class="row">
+  <div><a class="title" href="build-37-81a5c09/">build-37-81a5c09</a><div class="subject">Biblioteca: archivar artículos con el gesto y ver el archivo</div><div class="muted">0.14.37 (37) · claude/archive-swipe-gestures · <code>81a5c09</code> · 2026-10-23 20:56 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-37-81a5c09%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-35-cc6be21/">build-35-cc6be21</a><div class="subject">YouTube: el tamaño de resumen por defecto es Mediano</div><div class="muted">0.14.35 (35) · claude/youtube-summary-size-option-us6ipy · <code>cc6be21</code> · 2026-10-23 20:43 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-35-cc6be21%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-34-71b7c28/">build-34-71b7c28</a><div class="subject">YouTube: elegir el tamaño del resumen y no guardar la transcripción</div><div class="muted">0.14.34 (34) · claude/youtube-summary-size-option-us6ipy · <code>71b7c28</code> · 2026-10-23 20:25 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-34-71b7c28%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-32-e4ed924/">build-32-e4ed924</a><div class="subject">YouTube: descubrir los modelos de cada proveedor de voz y de LLM</div><div class="muted">0.13.32 (32) · youtube-model-discovery · <code>e4ed924</code> · 2026-10-23 18:22 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-32-e4ed924%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-30-57f04c3/">build-30-57f04c3</a><div class="subject">YouTube: probar las claves de la API y elegir proveedor de LLM</div><div class="muted">0.12.30 (30) · claude/api-test-buttons-llm-providers-3offbx · <code>57f04c3</code> · 2026-10-23 18:11 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-30-57f04c3%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-28-b24d6e4/">build-28-b24d6e4</a><div class="subject">YouTube: guardar vídeos como resumen «Main takeaways» (Whisper en Groq + Gemini)</div><div class="muted">0.11.28 (28) · claude/youtube-summaries · <code>b24d6e4</code> · 2026-10-22 23:51 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-28-b24d6e4%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-25-50af710/">build-25-50af710</a><div class="subject">Pages: mostrar el título del commit también en builds antiguos</div><div class="muted">0.9.25 (25) · claude/exciting-allen-4qbw3d · <code>50af710</code> · 2026-10-22 18:00 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-25-50af710%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-23-1d66db9/">build-23-1d66db9</a><div class="subject">Ajustes: mostrar el nombre del build en «Acerca de»</div><div class="muted">0.8.23 (23) · claude/great-gates-24rovz · <code>1d66db9</code> · 2026-10-22 17:56 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-23-1d66db9%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-22-890e371/">build-22-890e371</a><div class="subject">Biblioteca: permitir cambiar el título de un artículo</div><div class="muted">0.8.22 (22) · claude/article-title-change-3abfso · <code>890e371</code> · 2026-10-22 17:54 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-22-890e371%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-20-269cc61/">build-20-269cc61</a><div class="subject">Icono: usar el monograma como icono de la app</div><div class="muted">0.7.20 (20) · claude/opciones-icono · <code>269cc61</code> · 2026-10-22 17:33 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-20-269cc61%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-18-eead619/">build-18-eead619</a><div class="subject">Pages: mostrar el título del commit en cada build</div><div class="muted">0.6.18 (18) · claude/github-pages-commit-title-2wijlc · <code>eead619</code> · 2026-10-22 13:39 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-18-eead619%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-17-aafc215/">build-17-aafc215</a><div class="subject">Diseño: ocho opciones de icono (papel, resaltar, leer, real)</div><div class="muted">0.6.17 (17) · claude/opciones-icono · <code>aafc215</code> · 2026-10-22 05:33 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-17-aafc215%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-15-e4391ae/">build-15-e4391ae</a><div class="subject">Lector: cerrar el diccionario al tocar un asa de la selección</div><div class="muted">0.5.15 (15) · claude/cerrar-diccionario-al-tocar-asa · <code>e4391ae</code> · 2026-10-22 00:49 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-15-e4391ae%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-13-38594e8/">build-13-38594e8</a><div class="subject">Diccionario: difuminar la tapa del botón de cerrar</div><div class="muted">0.4.13 (13) · claude/eliminar-boton-x-circulo-tzlur6 · <code>38594e8</code> · 2026-10-22 00:40 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-13-38594e8%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-12-1386455/">build-12-1386455</a><div class="subject">Diccionario: tapar el botón de cerrar del diccionario del sistema</div><div class="muted">0.4.12 (12) · claude/eliminar-boton-x-circulo-tzlur6 · <code>1386455</code> · 2026-10-22 00:12 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-12-1386455%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-11-9bbdbf4/">build-11-9bbdbf4</a><div class="subject">Diccionario: ocultar el botón de cerrar del diccionario del sistema</div><div class="muted">0.4.11 (11) · claude/eliminar-boton-x-circulo-tzlur6 · <code>9bbdbf4</code> · 2026-10-21 23:37 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-11-9bbdbf4%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-9-cc1f269/">build-9-cc1f269</a><div class="subject">Lector: mantener la selección visible con el diccionario y arreglar el botón de cerrar</div><div class="muted">0.3.9 (9) · claude/leonora-word-selection-ui-0nykms · <code>cc1f269</code> · 2026-10-21 23:16 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-9-cc1f269%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-7-8459be5/">build-7-8459be5</a><div class="subject">Añadir pestaña Blogs para guardar portadas de blogs y newsletters</div><div class="muted">0.2.7 (7) · claude/eager-bardeen-vu22j9 · <code>8459be5</code> · 2026-10-14 15:55 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-7-8459be5%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-4-8811c75/">build-4-8811c75</a><div class="subject">Importar PDF y convertirlos a Markdown</div><div class="muted">0.1.4 (4) · claude/kind-babbage-hzx3fc · <code>8811c75</code> · 2026-10-14 15:33 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-4-8811c75%2Fmanifest.plist">Instalar</a>
+</div>
+<div class="row">
+  <div><a class="title" href="build-5-8811c75/">build-5-8811c75</a><div class="subject">Importar PDF y convertirlos a Markdown</div><div class="muted">0.1.5 (5) · claude/kind-babbage-hzx3fc · <code>8811c75</code> · 2026-10-14 15:33 UTC</div></div>
+  <a class="button small" href="itms-services://?action=download-manifest&amp;url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-5-8811c75%2Fmanifest.plist">Instalar</a>
+</div></div>
+
+</main></body>
+</html>

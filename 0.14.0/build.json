@@ -1,0 +1,18 @@
+{
+  "tag": "0.14.0",
+  "version": "0.14.0",
+  "build": "33",
+  "channel": "stable",
+  "branch": "main",
+  "sha": "41cc368d500379e66bbe2d35ad55d56e466076a9",
+  "commit_title": "YouTube: descubrir los modelos de cada proveedor de voz y de LLM (#14)",
+  "created": "2026-10-23T20:21:32Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/40018300446",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/0.14.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/0.14.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.14.0%2Fmanifest.plist"
+}

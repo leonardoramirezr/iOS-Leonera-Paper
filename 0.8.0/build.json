@@ -1,0 +1,18 @@
+{
+  "tag": "0.8.0",
+  "version": "0.8.0",
+  "build": "21",
+  "channel": "stable",
+  "branch": "main",
+  "sha": "3230d9baabfde3c7ed1e76b39f439e9ba2f85b9f",
+  "commit_title": "Icono: monograma «P» (papel, resaltar, leer, real) (#7)",
+  "created": "2026-10-22T17:51:55Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/39825407148",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/0.8.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/0.8.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.8.0%2Fmanifest.plist"
+}

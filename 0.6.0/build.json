@@ -1,0 +1,17 @@
+{
+  "tag": "0.6.0",
+  "version": "0.6.0",
+  "build": "16",
+  "channel": "stable",
+  "branch": "main",
+  "sha": "f093f221b2f46275221c95590e85c4eaa9d70bd4",
+  "created": "2026-10-22T01:00:48Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/39702975468",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/0.6.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/0.6.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.6.0%2Fmanifest.plist"
+}

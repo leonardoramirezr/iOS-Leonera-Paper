@@ -1,0 +1,18 @@
+{
+  "tag": "build-34-71b7c28",
+  "version": "0.14.34",
+  "build": "34",
+  "channel": "prerelease",
+  "branch": "claude/youtube-summary-size-option-us6ipy",
+  "sha": "71b7c28ff6d4b92c5a18dbe1c523807258f9a476",
+  "commit_title": "YouTube: elegir el tamaño del resumen y no guardar la transcripción",
+  "created": "2026-10-23T20:25:38Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/40018911121",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-34-71b7c28/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-34-71b7c28/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-34-71b7c28%2Fmanifest.plist"
+}

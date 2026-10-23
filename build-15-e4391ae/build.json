@@ -1,0 +1,17 @@
+{
+  "tag": "build-15-e4391ae",
+  "version": "0.5.15",
+  "build": "15",
+  "channel": "prerelease",
+  "branch": "claude/cerrar-diccionario-al-tocar-asa",
+  "sha": "e4391ae2c2b7015231a89846a8548d1e5bf45acb",
+  "created": "2026-10-22T00:49:36Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/39701867857",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-15-e4391ae/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-15-e4391ae/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-15-e4391ae%2Fmanifest.plist"
+}

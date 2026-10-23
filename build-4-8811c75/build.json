@@ -1,0 +1,17 @@
+{
+  "tag": "build-4-8811c75",
+  "version": "0.1.4",
+  "build": "4",
+  "channel": "prerelease",
+  "branch": "claude/kind-babbage-hzx3fc",
+  "sha": "8811c75b4d5f47e0d10b257c7bfdbd592d3ee1ef",
+  "created": "2026-10-14T15:33:47Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/38590118139",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-4-8811c75/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-4-8811c75/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-4-8811c75%2Fmanifest.plist"
+}

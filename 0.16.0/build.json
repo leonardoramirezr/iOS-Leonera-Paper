@@ -1,0 +1,18 @@
+{
+  "tag": "0.16.0",
+  "version": "0.16.0",
+  "build": "38",
+  "channel": "stable",
+  "branch": "main",
+  "sha": "e68bb50ab3da78c0549c0b2ce1ad80ea25833224",
+  "commit_title": "Biblioteca: archivar artículos con el gesto y ver el archivo (#16)",
+  "created": "2026-10-23T22:32:13Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/40034059888",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/0.16.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/0.16.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.16.0%2Fmanifest.plist"
+}

@@ -1,0 +1,18 @@
+{
+  "tag": "build-37-81a5c09",
+  "version": "0.14.37",
+  "build": "37",
+  "channel": "prerelease",
+  "branch": "claude/archive-swipe-gestures",
+  "sha": "81a5c09ed39a7c8a5fd0a10fc882308d94236591",
+  "commit_title": "Biblioteca: archivar artículos con el gesto y ver el archivo",
+  "created": "2026-10-23T20:56:19Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/40022615441",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-37-81a5c09/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-37-81a5c09/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-37-81a5c09%2Fmanifest.plist"
+}
