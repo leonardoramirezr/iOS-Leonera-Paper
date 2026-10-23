@@ -8,10 +8,9 @@ struct VideoSummary: Sendable {
     var overview: String?
 }
 
-/// Writes the summary with a Gemini model through Gemini's OpenAI-compatible API
-/// (`/v1beta/openai/chat/completions`).
-enum GeminiSummarizer {
-    private static let endpoint = URL(string: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions")!
+/// Writes the summary with the chat model of the chosen provider, through its OpenAI-compatible
+/// chat completions API.
+enum LLMSummarizer {
     static let heading = "## Main takeaways"
 
     private struct Message: Encodable {
@@ -38,28 +37,40 @@ enum GeminiSummarizer {
     }
 
     static func summarize(_ transcript: String, title: String, channel: String?,
-                          language: YouTubeSettings.SummaryLanguage, apiKey: String, model: String) async throws -> VideoSummary {
+                          language: YouTubeSettings.SummaryLanguage, connection: LLMConnection) async throws -> VideoSummary {
         var details = "Title: \(title)\n"
         if let channel, !channel.isEmpty { details += "Channel: \(channel)\n" }
-        let chat = ChatRequest(model: model, messages: [
+        let data = try await post([
             Message(role: "system", content: instructions(language: language)),
             Message(role: "user", content: "\(details)\nTranscript:\n\(transcript)"),
-        ])
-
-        var request = URLRequest(url: endpoint, timeoutInterval: 300)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let data = try await AIService.send(request, body: try JSONEncoder().encode(chat), service: "Gemini")
+        ], connection: connection, timeout: 300)
         let response = try JSONDecoder().decode(ChatResponse.self, from: data)
         let content = response.choices.first?.message?.content ?? ""
         let markdown = clean(content)
         guard !markdown.isEmpty else {
             let reason = response.choices.first?.finish_reason.map { " (\($0))" } ?? ""
-            throw AIServiceError(service: "Gemini", status: 200, message: "devolvió un resumen vacío\(reason).")
+            throw AIServiceError(service: connection.provider.name, status: 200,
+                                 message: "devolvió un resumen vacío\(reason).")
         }
         return VideoSummary(markdown: markdown, overview: overview(in: markdown))
+    }
+
+    /// Sends a one-word request with the connection's key, endpoint and model: an answer shows that
+    /// the three work together. It does not retry, because someone is waiting on the button.
+    static func checkConnection(_ connection: LLMConnection) async throws {
+        _ = try await post([Message(role: "user", content: "Reply with OK.")],
+                           connection: connection, timeout: 60, retries: 0)
+    }
+
+    private static func post(_ messages: [Message], connection: LLMConnection,
+                             timeout: TimeInterval, retries: Int = 3) async throws -> Data {
+        var request = URLRequest(url: connection.endpoint, timeoutInterval: timeout)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(connection.apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let chat = ChatRequest(model: connection.model, messages: messages)
+        return try await AIService.send(request, body: try JSONEncoder().encode(chat),
+                                        service: connection.provider.name, retries: retries)
     }
 
     private static func instructions(language: YouTubeSettings.SummaryLanguage) -> String {

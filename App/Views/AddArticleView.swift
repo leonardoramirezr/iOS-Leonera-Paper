@@ -26,12 +26,12 @@ struct AddArticleView: View {
                         }
                     }
                     if let url, YouTubeLink.isVideo(url) {
-                        if youtube.hasAPIKeys {
-                            Label("Vídeo de YouTube: se transcribirá con Whisper y se resumirá con Gemini.",
+                        if youtube.canSummarizeVideos {
+                            Label("Vídeo de YouTube: se transcribirá con Whisper y se resumirá con \(youtube.summaryProvider.name).",
                                   systemImage: "play.rectangle")
                                 .font(.footnote)
                         } else {
-                            Label("Para resumir vídeos de YouTube, añade las claves de Groq y Gemini en Ajustes › Resúmenes de YouTube.",
+                            Label("Para resumir vídeos de YouTube, añade las claves de Groq y de \(youtube.summaryProvider.name) en Ajustes › Resúmenes de YouTube.",
                                   systemImage: "key")
                                 .font(.footnote)
                                 .foregroundStyle(.orange)

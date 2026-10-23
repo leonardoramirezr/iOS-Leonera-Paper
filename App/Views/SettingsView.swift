@@ -8,6 +8,8 @@ struct SettingsView: View {
     @Environment(YouTubeSettings.self) private var youtube
     @Environment(\.dismiss) private var dismiss
     @State private var connecting = false
+    @State private var transcriptionCheck = KeyCheck.idle
+    @State private var summaryCheck = KeyCheck.idle
 
     var body: some View {
         @Bindable var drive = drive
@@ -52,16 +54,43 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    SecureField("Clave de la API de Groq", text: $youtube.groqAPIKey)
+                    SecureField("Clave de la API de Groq", text: keyBinding(.groq))
                     Picker("Modelo de Whisper", selection: $youtube.transcriptionModel) {
                         ForEach(YouTubeSettings.transcriptionModels, id: \.self) { model in
                             Text(model).tag(model)
                         }
                     }
-                    SecureField("Clave de la API de Gemini", text: $youtube.geminiAPIKey)
-                    LabeledContent("Modelo de Gemini") {
-                        TextField("Modelo de Gemini", text: $youtube.summaryModel,
-                                  prompt: Text(YouTubeSettings.defaultSummaryModel))
+                    checkButton("Probar clave de voz a texto", check: $transcriptionCheck,
+                                disabled: youtube.apiKey(for: .groq).isEmpty) {
+                        try await youtube.checkTranscriptionKey()
+                    }
+                } header: {
+                    Text("Resúmenes de YouTube")
+                } footer: {
+                    Text("Whisper transcribe el audio de los vídeos con la API de Groq. Crea la clave en console.groq.com/keys; se guarda en el llavero del iPhone.")
+                }
+
+                Section {
+                    Picker("Proveedor", selection: $youtube.summaryProvider) {
+                        ForEach(LLMProvider.allCases) { provider in
+                            Text(provider.name).tag(provider)
+                        }
+                    }
+                    SecureField("Clave de la API de \(youtube.summaryProvider.name)",
+                                text: keyBinding(youtube.summaryProvider))
+                    if youtube.summaryProvider == .cloudflare {
+                        TextField("ID de la cuenta de Cloudflare", text: $youtube.cloudflareAccountID)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                    }
+                    if youtube.summaryProvider == .custom {
+                        TextField("URL base de la API", text: $youtube.customBaseURL)
+                            .keyboardType(.URL)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                    }
+                    LabeledContent("Modelo") {
+                        TextField("Modelo", text: $youtube.summaryModel, prompt: Text(modelPrompt))
                             .multilineTextAlignment(.trailing)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
@@ -71,10 +100,14 @@ struct SettingsView: View {
                             Text(language.title).tag(language)
                         }
                     }
+                    checkButton("Probar clave de LLM (\(youtube.summaryProvider.name))", check: $summaryCheck,
+                                disabled: !youtube.isSummaryReady) {
+                        try await youtube.checkSummaryConnection()
+                    }
                 } header: {
-                    Text("Resúmenes de YouTube")
+                    Text("Modelo de lenguaje")
                 } footer: {
-                    Text("Al guardar un enlace de YouTube se descarga el audio, Whisper lo transcribe en Groq y Gemini escribe un resumen «Main takeaways», que aparece en la lista de artículos con la transcripción debajo. Crea las claves en console.groq.com/keys y aistudio.google.com/apikey; se guardan en el llavero del iPhone.")
+                    Text(summaryFooter)
                 }
 
                 Section {
@@ -135,6 +168,9 @@ struct SettingsView: View {
                     LabeledContent("Build", value: Self.buildName)
                 }
             }
+            .onChange(of: youtube.apiKey(for: .groq)) { _, _ in transcriptionCheck = .idle }
+            .onChange(of: youtube.transcriptionModel) { _, _ in transcriptionCheck = .idle }
+            .onChange(of: youtube.summaryConnection) { _, _ in summaryCheck = .idle }
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -148,4 +184,80 @@ struct SettingsView: View {
     private static var buildName: String {
         Bundle.main.infoDictionary?["LPBuildTag"] as? String ?? "?"
     }
+
+    private var summaryFooter: String {
+        var text = "Al guardar un enlace de YouTube, el modelo escribe un resumen «Main takeaways» que aparece en la lista de artículos, con la transcripción debajo. Todos los proveedores usan su API compatible con OpenAI."
+        if youtube.summaryProvider == .cloudflare {
+            text += " En Cloudflare necesitas el ID de tu cuenta y un token de API con permiso de Workers AI."
+        }
+        if youtube.summaryProvider == .custom {
+            text += " Indica la URL base de la API (por ejemplo, https://api.ejemplo.com/v1) y el nombre del modelo."
+        }
+        if let page = youtube.summaryProvider.keyPage {
+            text += " Crea la clave en \(page)."
+        }
+        return text + " Las claves se guardan en el llavero del iPhone."
+    }
+
+    /// The provider's default model, or a hint when the user has to type the model.
+    private var modelPrompt: String {
+        let model = youtube.summaryProvider.defaultModel
+        return model.isEmpty ? "Nombre del modelo" : model
+    }
+
+    /// Binding to the key of one provider, which is stored in the Keychain.
+    private func keyBinding(_ provider: LLMProvider) -> Binding<String> {
+        Binding(
+            get: { youtube.apiKey(for: provider) },
+            set: { youtube.setAPIKey($0, for: provider) }
+        )
+    }
+
+    /// «Probar clave» button. Its outcome stays under it until the key, model or endpoint changes.
+    private func checkButton(_ title: String, check: Binding<KeyCheck>, disabled: Bool,
+                             _ work: @escaping () async throws -> Void) -> some View {
+        Group {
+            Button {
+                check.wrappedValue = .running
+                Task {
+                    do {
+                        try await work()
+                        check.wrappedValue = .passed
+                    } catch {
+                        check.wrappedValue = .failed(error.localizedDescription)
+                    }
+                }
+            } label: {
+                HStack {
+                    Text(title)
+                    if check.wrappedValue == .running {
+                        Spacer()
+                        ProgressView()
+                    }
+                }
+            }
+            .disabled(disabled || check.wrappedValue == .running)
+
+            switch check.wrappedValue {
+            case .idle, .running:
+                EmptyView()
+            case .passed:
+                Label("Clave y modelo correctos.", systemImage: "checkmark.circle")
+                    .font(.footnote)
+                    .foregroundStyle(.green)
+            case .failed(let message):
+                Text(message)
+                    .font(.footnote)
+                    .foregroundStyle(.red)
+            }
+        }
+    }
+}
+
+/// Outcome of a «Probar clave» check.
+private enum KeyCheck: Equatable {
+    case idle
+    case running
+    case passed
+    case failed(String)
 }

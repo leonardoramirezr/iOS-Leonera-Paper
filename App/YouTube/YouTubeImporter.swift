@@ -3,27 +3,32 @@ import UIKit
 
 enum YouTubeImportError: LocalizedError {
     case missingGroqKey
-    case missingGeminiKey
+    case missingSummaryKey(String)
+    case incompleteSummarySettings
     case emptyTranscript
 
     var errorDescription: String? {
         switch self {
         case .missingGroqKey: return "Falta la clave de la API de Groq (Ajustes › Resúmenes de YouTube)."
-        case .missingGeminiKey: return "Falta la clave de la API de Gemini (Ajustes › Resúmenes de YouTube)."
+        case .missingSummaryKey(let provider):
+            return "Falta la clave de la API de \(provider) (Ajustes › Resúmenes de YouTube)."
+        case .incompleteSummarySettings:
+            return "Falta la URL base, el ID de cuenta o el modelo del proveedor de resúmenes (Ajustes › Resúmenes de YouTube)."
         case .emptyTranscript: return "Whisper no encontró voz en el audio del vídeo."
         }
     }
 }
 
 /// Saves a YouTube video as an article: downloads its audio, transcribes it with Whisper
-/// (Groq), summarizes it with Gemini and writes a Markdown file with the summary followed by
-/// the transcript.
+/// (Groq), summarizes it with the chosen LLM provider and writes a Markdown file with the summary
+/// followed by the transcript.
 @MainActor
 enum YouTubeImporter {
     static func importVideo(id videoID: String, settings: YouTubeSettings.Configuration, storage: ArticleStorage,
                             progress: @escaping @MainActor (String) -> Void) async throws -> Article {
         guard !settings.groqAPIKey.isEmpty else { throw YouTubeImportError.missingGroqKey }
-        guard !settings.geminiAPIKey.isEmpty else { throw YouTubeImportError.missingGeminiKey }
+        guard let llm = settings.summary else { throw YouTubeImportError.incompleteSummarySettings }
+        guard !llm.apiKey.isEmpty else { throw YouTubeImportError.missingSummaryKey(llm.provider.name) }
 
         let activity = BackgroundActivity(name: "Resumir vídeo de YouTube")
         defer { activity.end() }
@@ -55,10 +60,9 @@ enum YouTubeImporter {
         }
         guard let info, let transcript else { throw YouTubeError.noStreams }
 
-        progress("Resumiendo con Gemini…")
-        let summary = try await GeminiSummarizer.summarize(transcript.text, title: info.title, channel: info.channel,
-                                                           language: settings.summaryLanguage,
-                                                           apiKey: settings.geminiAPIKey, model: settings.summaryModel)
+        progress("Resumiendo con \(llm.provider.name)…")
+        let summary = try await LLMSummarizer.summarize(transcript.text, title: info.title, channel: info.channel,
+                                                        language: settings.summaryLanguage, connection: llm)
 
         progress("Guardando Markdown…")
         let folder = try storage.makeFolder(for: info.title)
@@ -174,7 +178,7 @@ enum YouTubeImporter {
         front.append("video: \(yaml(info.id))")
         if let duration = info.duration { front.append("duration: \(duration)") }
         front.append("transcription: \(yaml(settings.transcriptionModel))")
-        front.append("summary: \(yaml(settings.summaryModel))")
+        if let model = settings.summary?.model { front.append("summary: \(yaml(model))") }
         front.append("saved: \(ISO8601DateFormatter().string(from: savedAt))")
         front.append("---")
 

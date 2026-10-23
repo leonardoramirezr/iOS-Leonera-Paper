@@ -34,7 +34,8 @@ como Markdown, leerlos con varios estilos, resaltarlos y consultar el diccionari
   lista con el icono a la izquierda y el título a la derecha; tocar uno lo abre.
 - **YouTube video summaries**: paste a YouTube link (**+** button) or share it from
   the YouTube app or Safari. The app downloads the audio, transcribes it with Whisper
-  on Groq and has Gemini write a *Main takeaways* summary. The video is saved as an
+  on Groq and has the LLM provider you choose (Gemini, Claude, OpenAI, Groq, NVIDIA,
+  Cloudflare and others) write a *Main takeaways* summary. The video is saved as an
   article in the list: its thumbnail, channel, length and the first lines of the
   summary show in the list, and the article holds the summary followed by the
   transcript, with links to each minute of the video. See
@@ -83,14 +84,37 @@ Oxford no ofrece una API gratuita, así que hay dos modos:
 
 ### YouTube summaries
 
-1. Create an API key for [Groq](https://console.groq.com/keys) and one for
-   [Gemini](https://aistudio.google.com/apikey).
-2. Enter them in *Ajustes › Resúmenes de YouTube*. They are stored in the iPhone
-   keychain and never go into the build: the IPA is public on GitHub Pages.
-3. Optional settings in the same section: the Whisper model
-   (`whisper-large-v3-turbo` by default, or `whisper-large-v3`), the Gemini model
-   (`gemini-3.8-flash` by default) and the summary language (the video's language by
-   default, Spanish or English).
+1. Create an API key for [Groq](https://console.groq.com/keys), which transcribes the
+   audio with Whisper, and one for the LLM provider that writes the summary.
+2. Enter them in *Ajustes › Resúmenes de YouTube* and *Modelo de lenguaje*. They are
+   stored in the iPhone keychain and never go into the build: the IPA is public on
+   GitHub Pages. Each *Probar clave* button checks its key: Groq lists its models and
+   confirms that the Whisper model is among them, and the LLM provider answers a
+   one-word request sent with the chosen model.
+3. Choose the provider and its model. Every provider is reached through its
+   OpenAI-compatible chat completions API:
+
+   | Provider | Base URL | Default model |
+   | --- | --- | --- |
+   | Gemini | `https://generativelanguage.googleapis.com/v1beta/openai` | `gemini-3.8-flash` |
+   | Groq | `https://api.groq.com/openai/v1` | `openai/gpt-oss-120b` |
+   | NVIDIA | `https://integrate.api.nvidia.com/v1` | `meta/llama-3.3-70b-instruct` |
+   | OpenAI | `https://api.openai.com/v1` | `gpt-5-mini` |
+   | Claude | `https://api.anthropic.com/v1` | `claude-opus-5-5` |
+   | Cloudflare Workers AI | `https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1` | `@cf/openai/gpt-oss-120b` |
+   | Mistral | `https://api.mistral.ai/v1` | `mistral-small-latest` |
+   | OpenRouter | `https://openrouter.ai/api/v1` | `openai/gpt-5-mini` |
+   | DeepSeek | `https://api.deepseek.com` | `deepseek-flash` |
+   | xAI (Grok) | `https://api.x.ai/v1` | `grok-4.7` |
+   | Other | the base URL you enter | the model you enter |
+
+   Cloudflare needs your account ID, and *Other* needs its base URL. Switching provider
+   restores that provider's default model, and any model can be typed in. Claude goes
+   through Anthropic's OpenAI SDK compatibility layer, which Anthropic presents as a way
+   to test models rather than a production interface.
+4. Optional settings: the Whisper model (`whisper-large-v3-turbo` by default, or
+   `whisper-large-v3`) and the summary language (the video's language by default,
+   Spanish or English).
 
 How an import works (`App/YouTube/`):
 
@@ -107,15 +131,15 @@ How an import works (`App/YouTube/`):
    it into 30-minute parts, which stay under Groq's 25 MB upload limit.
 4. `GroqTranscriber` sends each part to `/openai/v1/audio/transcriptions`
    (`verbose_json`, for the segment times).
-5. `GeminiSummarizer` sends the transcript to Gemini's OpenAI-compatible endpoint
-   (`/v1beta/openai/chat/completions`) and asks for an overview sentence followed by a
-   numbered `## Main takeaways` list.
+5. `LLMSummarizer` sends the transcript to the chat completions endpoint of the chosen
+   provider and asks for an overview sentence followed by a numbered `## Main takeaways`
+   list. `LLMProvider` holds each provider's base URL and default model.
 6. `YouTubeImporter` writes the Markdown file: front matter, title, channel, link and
    length, thumbnail, summary and the transcript under *Transcripción*, in paragraphs of
    about a minute that start with a link to that moment of the video.
 
 The video data, the audio and the transcript are kept in `Caches/YouTube/<id>/` until
-the article is saved. If a step fails (for example, a missing Gemini key), *Reintentar*
+the article is saved. If a step fails (for example, a missing key), *Reintentar*
 resumes from that step without downloading or transcribing again.
 
 ## Estructura
@@ -125,7 +149,7 @@ resumes from that step without downloading or transcribing again.
 | `project.yml` | Proyecto de [XcodeGen](https://github.com/yonaskolb/XcodeGen) (app + extensión de compartir). |
 | `App/` | App SwiftUI: biblioteca, importación (web y PDF), lector, diccionario y Google Drive. |
 | `App/Markdown/` | Intérprete de Markdown con mapa de posiciones (para escribir `==…==` en el sitio exacto). |
-| `App/YouTube/` | YouTube summaries: audio download, conversion, Whisper transcription (Groq) and summary (Gemini). |
+| `App/YouTube/` | YouTube summaries: audio download, conversion, Whisper transcription (Groq) and summary (any OpenAI-compatible provider). |
 | `ShareExtension/` | Extensión «Compartir» de Safari. |
 | `Shared/` | Código común: cola de enlaces pendientes en un grupo de llavero. |
 | `Config/` | `Info.plist` y entitlements. |
