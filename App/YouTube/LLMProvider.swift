@@ -76,6 +76,20 @@ enum LLMProvider: String, CaseIterable, Identifiable, Sendable {
         case .custom: return customBaseURL.isEmpty ? nil : customBaseURL
         }
     }
+
+    /// URL that lists the models the key can use, nil when the provider has no list. Cloudflare's
+    /// OpenAI-compatible base URL has none, so it lists its Workers AI catalog instead.
+    func modelsURL(cloudflareAccountID: String, customBaseURL: String) -> URL? {
+        switch self {
+        case .cloudflare:
+            guard !cloudflareAccountID.isEmpty else { return nil }
+            return URL(string: "https://api.cloudflare.com/client/v4/accounts/\(cloudflareAccountID)/ai/models/search?per_page=100")
+        default:
+            guard let base = baseURL(cloudflareAccountID: cloudflareAccountID, customBaseURL: customBaseURL)?
+                .trimmingCharacters(in: CharacterSet(charactersIn: "/")) else { return nil }
+            return URL(string: base + "/models")
+        }
+    }
 }
 
 /// What a summary request needs: the provider, its chat completions URL, the key and the model.

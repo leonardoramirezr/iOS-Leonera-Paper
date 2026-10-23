@@ -10,6 +10,9 @@ struct SettingsView: View {
     @State private var connecting = false
     @State private var transcriptionCheck = KeyCheck.idle
     @State private var summaryCheck = KeyCheck.idle
+    /// Models the accounts offer, read when the key changes. Empty until they answer.
+    @State private var discoveredTranscriptionModels: [String] = []
+    @State private var discoveredSummaryModels: [String] = []
 
     var body: some View {
         @Bindable var drive = drive
@@ -56,7 +59,7 @@ struct SettingsView: View {
                 Section {
                     SecureField("Clave de la API de Groq", text: keyBinding(.groq))
                     Picker("Modelo de Whisper", selection: $youtube.transcriptionModel) {
-                        ForEach(YouTubeSettings.transcriptionModels, id: \.self) { model in
+                        ForEach(transcriptionOptions, id: \.self) { model in
                             Text(model).tag(model)
                         }
                     }
@@ -89,11 +92,20 @@ struct SettingsView: View {
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
                     }
-                    LabeledContent("Modelo") {
-                        TextField("Modelo", text: $youtube.summaryModel, prompt: Text(modelPrompt))
-                            .multilineTextAlignment(.trailing)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
+                    if discoveredSummaryModels.isEmpty {
+                        LabeledContent("Modelo") {
+                            TextField("Modelo", text: $youtube.summaryModel, prompt: Text(modelPrompt))
+                                .multilineTextAlignment(.trailing)
+                                .textInputAutocapitalization(.never)
+                                .autocorrectionDisabled()
+                        }
+                    } else {
+                        Picker("Modelo", selection: $youtube.summaryModel) {
+                            ForEach(pickerOptions(discoveredSummaryModels, current: youtube.summaryModel), id: \.self) { model in
+                                Text(model).tag(model)
+                            }
+                        }
+                        .pickerStyle(.menu)
                     }
                     Picker("Idioma del resumen", selection: $youtube.summaryLanguage) {
                         ForEach(YouTubeSettings.SummaryLanguage.allCases) { language in
@@ -171,6 +183,20 @@ struct SettingsView: View {
             .onChange(of: youtube.apiKey(for: .groq)) { _, _ in transcriptionCheck = .idle }
             .onChange(of: youtube.transcriptionModel) { _, _ in transcriptionCheck = .idle }
             .onChange(of: youtube.summaryConnection) { _, _ in summaryCheck = .idle }
+            .task(id: youtube.apiKey(for: .groq)) {
+                discoveredTranscriptionModels = []
+                guard await settleTyping() else { return }
+                let models = await youtube.discoverTranscriptionModels()
+                guard !Task.isCancelled else { return }
+                discoveredTranscriptionModels = models
+            }
+            .task(id: youtube.summaryModelList) {
+                discoveredSummaryModels = []
+                guard await settleTyping() else { return }
+                let models = await youtube.discoverSummaryModels()
+                guard !Task.isCancelled else { return }
+                discoveredSummaryModels = models
+            }
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -203,6 +229,28 @@ struct SettingsView: View {
     private var modelPrompt: String {
         let model = youtube.summaryProvider.defaultModel
         return model.isEmpty ? "Nombre del modelo" : model
+    }
+
+    /// Whisper models to offer: the ones the Groq account lists, or the known ones until it answers.
+    private var transcriptionOptions: [String] {
+        pickerOptions(discoveredTranscriptionModels.isEmpty ? YouTubeSettings.transcriptionModels : discoveredTranscriptionModels,
+                      current: youtube.transcriptionModel)
+    }
+
+    /// Adds the current model when the list lacks it, so the picker always has a row for the selection.
+    private func pickerOptions(_ models: [String], current: String) -> [String] {
+        current.isEmpty || models.contains(current) ? models : models + [current]
+    }
+
+    /// Waits until the key stops changing, so that typing a key does not start a request per keystroke.
+    /// False when the key changed meanwhile.
+    private func settleTyping() async -> Bool {
+        do {
+            try await Task.sleep(for: .milliseconds(600))
+            return true
+        } catch {
+            return false
+        }
     }
 
     /// Binding to the key of one provider, which is stored in the Keychain.

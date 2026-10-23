@@ -31,23 +31,19 @@ enum GroqTranscriber {
         var segments: [Segment]?
     }
 
-    private struct ModelList: Decodable {
-        struct Model: Decodable {
-            var id: String
-        }
-
-        var data: [Model]
-    }
-
-    /// Checks the key with the model list, which transcribes nothing, and that the account offers
-    /// the Whisper model.
-    static func checkKey(_ apiKey: String, model: String) async throws {
+    /// Whisper models the account offers, sorted. The list transcribes nothing, so it is also how
+    /// the key is checked.
+    static func whisperModels(apiKey: String) async throws -> [String] {
         var request = URLRequest(url: modelsEndpoint, timeoutInterval: 60)
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
 
         let data = try await AIService.send(request, service: "Groq", retries: 0)
-        let list = try JSONDecoder().decode(ModelList.self, from: data)
-        guard list.data.contains(where: { $0.id == model }) else {
+        return try ModelDiscovery.openAIModelIDs(data).filter { $0.contains("whisper") }.sorted()
+    }
+
+    /// Checks the key and that the account offers the Whisper model.
+    static func checkKey(_ apiKey: String, model: String) async throws {
+        guard try await whisperModels(apiKey: apiKey).contains(model) else {
             throw AIServiceError(service: "Groq", status: 404, message: "no ofrece el modelo «\(model)» con esta clave.")
         }
     }
