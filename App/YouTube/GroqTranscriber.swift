@@ -17,6 +17,7 @@ struct Transcript: Codable, Sendable {
 /// Speech to text with Whisper on Groq (`/openai/v1/audio/transcriptions`).
 enum GroqTranscriber {
     private static let endpoint = URL(string: "https://api.groq.com/openai/v1/audio/transcriptions")!
+    private static let modelsEndpoint = URL(string: "https://api.groq.com/openai/v1/models")!
 
     private struct Response: Decodable {
         struct Segment: Decodable {
@@ -28,6 +29,27 @@ enum GroqTranscriber {
         var text: String
         var language: String?
         var segments: [Segment]?
+    }
+
+    private struct ModelList: Decodable {
+        struct Model: Decodable {
+            var id: String
+        }
+
+        var data: [Model]
+    }
+
+    /// Checks the key with the model list, which transcribes nothing, and that the account offers
+    /// the Whisper model.
+    static func checkKey(_ apiKey: String, model: String) async throws {
+        var request = URLRequest(url: modelsEndpoint, timeoutInterval: 60)
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+
+        let data = try await AIService.send(request, service: "Groq", retries: 0)
+        let list = try JSONDecoder().decode(ModelList.self, from: data)
+        guard list.data.contains(where: { $0.id == model }) else {
+            throw AIServiceError(service: "Groq", status: 404, message: "no ofrece el modelo «\(model)» con esta clave.")
+        }
     }
 
     /// Transcribes one audio file. Segment times are shifted by `offset` (where the file starts
