@@ -114,6 +114,30 @@ final class YouTubeSettings {
                              apiKey: trimmed(apiKey(for: summaryProvider)), model: model)
     }
 
+    /// Where the summary provider lists its models, with the key that reads them. Nil while the key
+    /// or the provider's URL is missing.
+    var summaryModelList: ModelListRequest? {
+        let provider = summaryProvider
+        let key = trimmed(apiKey(for: provider))
+        guard !key.isEmpty,
+              let url = provider.modelsURL(cloudflareAccountID: trimmed(cloudflareAccountID),
+                                           customBaseURL: trimmed(customBaseURL)) else { return nil }
+        return ModelListRequest(provider: provider, url: url, apiKey: key)
+    }
+
+    /// Chat models the summary provider offers to its key. Empty when it has no list or does not answer.
+    func discoverSummaryModels() async -> [String] {
+        guard let request = summaryModelList else { return [] }
+        return (try? await ModelDiscovery.chatModels(request)) ?? []
+    }
+
+    /// Whisper models the Groq account offers. Empty when the key is missing or does not answer.
+    func discoverTranscriptionModels() async -> [String] {
+        let key = trimmed(apiKey(for: .groq))
+        guard !key.isEmpty else { return [] }
+        return (try? await GroqTranscriber.whisperModels(apiKey: key)) ?? []
+    }
+
     var configuration: Configuration {
         let transcription = trimmed(transcriptionModel)
         return Configuration(

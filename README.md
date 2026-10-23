@@ -109,12 +109,15 @@ Oxford no ofrece una API gratuita, así que hay dos modos:
    | Other | the base URL you enter | the model you enter |
 
    Cloudflare needs your account ID, and *Other* needs its base URL. Switching provider
-   restores that provider's default model, and any model can be typed in. Claude goes
+   restores that provider's default model. Once the key is entered, Settings lists the
+   chat models the account can use, read from the provider's model list (Cloudflare's
+   Workers AI text generation catalog); providers without a list, or a model that is not
+   listed, can still be typed in. Claude goes
    through Anthropic's OpenAI SDK compatibility layer, which Anthropic presents as a way
    to test models rather than a production interface.
-4. Optional settings: the Whisper model (`whisper-large-v3-turbo` by default, or
-   `whisper-large-v3`) and the summary language (the video's language by default,
-   Spanish or English).
+4. Optional settings: the Whisper model (the Whisper models Groq lists for your key,
+   `whisper-large-v3-turbo` until they load) and the summary language (the video's
+   language by default, Spanish or English).
 
 How an import works (`App/YouTube/`):
 
