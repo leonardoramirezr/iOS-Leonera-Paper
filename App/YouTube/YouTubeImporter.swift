@@ -25,7 +25,7 @@ enum YouTubeImportError: LocalizedError {
 @MainActor
 enum YouTubeImporter {
     static func importVideo(id videoID: String, settings: YouTubeSettings.Configuration,
-                            summaryLength: YouTubeSettings.SummaryLength, storage: ArticleStorage,
+                            summaryLength: SummaryLength, storage: ArticleStorage,
                             progress: @escaping @MainActor (String) -> Void) async throws -> Article {
         guard !settings.groqAPIKey.isEmpty else { throw YouTubeImportError.missingGroqKey }
         guard let llm = settings.summary else { throw YouTubeImportError.incompleteSummarySettings }

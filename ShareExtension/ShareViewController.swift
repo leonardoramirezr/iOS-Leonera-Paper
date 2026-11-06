@@ -3,12 +3,15 @@ import UniformTypeIdentifiers
 
 /// Extensión «Compartir»: recoge la URL de Safari (o un texto con una URL), la deja
 /// en la cola compartida y abre Leonera Paper para que la convierta a Markdown.
+/// When the link is a YouTube video it first asks for the size of the summary.
 final class ShareViewController: UIViewController {
     private let card = UIView()
+    private let stack = UIStackView()
     private let titleLabel = UILabel()
     private let statusLabel = UILabel()
     private let spinner = UIActivityIndicatorView(style: .medium)
     private var started = false
+    private var lengthChoice: CheckedContinuation<SummaryLength?, Never>?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,7 +35,7 @@ final class ShareViewController: UIViewController {
 
         spinner.startAnimating()
 
-        let stack = UIStackView(arrangedSubviews: [titleLabel, spinner, statusLabel])
+        [titleLabel, spinner, statusLabel].forEach(stack.addArrangedSubview)
         stack.axis = .vertical
         stack.spacing = 12
         stack.alignment = .center
@@ -65,13 +68,75 @@ final class ShareViewController: UIViewController {
             return
         }
 
-        SharedQueue.enqueue(url: shared.url, title: shared.title)
+        var summaryLength: SummaryLength?
+        if YouTubeLink.isVideo(shared.url) {
+            guard let chosen = await askSummaryLength() else {
+                extensionContext?.cancelRequest(withError: NSError(domain: NSCocoaErrorDomain,
+                                                                   code: NSUserCancelledError))
+                return
+            }
+            summaryLength = chosen
+        }
+
+        SharedQueue.enqueue(url: shared.url, title: shared.title, summaryLength: summaryLength)
         var opened = false
-        if let link = AppLinks.importURL(for: shared.url) {
+        if let link = AppLinks.importURL(for: shared.url, summaryLength: summaryLength) {
             opened = openContainingApp(link)
         }
         finish(message: opened ? "Abriendo Leonera Paper…" : "Guardado. Se convertirá al abrir Leonera Paper.",
                success: true)
+    }
+
+    // MARK: - Tamaño del resumen
+
+    /// Shows one button per summary size and waits for a tap. Nil when the user cancels.
+    @MainActor
+    private func askSummaryLength() async -> SummaryLength? {
+        spinner.stopAnimating()
+        spinner.isHidden = true
+        statusLabel.text = "Tamaño del resumen del vídeo"
+        statusLabel.textColor = .label
+
+        let options = UIStackView()
+        options.axis = .vertical
+        options.spacing = 8
+        options.alignment = .fill
+        for length in SummaryLength.allCases {
+            var configuration: UIButton.Configuration = length == .medium ? .filled() : .tinted()
+            configuration.title = length.title
+            configuration.subtitle = length.detail
+            configuration.titleAlignment = .center
+            configuration.cornerStyle = .large
+            let button = UIButton(configuration: configuration, primaryAction: UIAction { [weak self] _ in
+                self?.chooseSummaryLength(length)
+            })
+            options.addArrangedSubview(button)
+        }
+        var cancel = UIButton.Configuration.plain()
+        cancel.title = "Cancelar"
+        options.addArrangedSubview(UIButton(configuration: cancel, primaryAction: UIAction { [weak self] _ in
+            self?.chooseSummaryLength(nil)
+        }))
+
+        stack.addArrangedSubview(options)
+        options.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
+
+        let chosen = await withCheckedContinuation { continuation in
+            lengthChoice = continuation
+        }
+        stack.removeArrangedSubview(options)
+        options.removeFromSuperview()
+        spinner.isHidden = false
+        spinner.startAnimating()
+        statusLabel.text = "Guardando vídeo…"
+        statusLabel.textColor = .secondaryLabel
+        return chosen
+    }
+
+    @MainActor
+    private func chooseSummaryLength(_ length: SummaryLength?) {
+        lengthChoice?.resume(returning: length)
+        lengthChoice = nil
     }
 
     @MainActor

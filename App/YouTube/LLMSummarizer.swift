@@ -37,7 +37,7 @@ enum LLMSummarizer {
     }
 
     static func summarize(_ transcript: String, title: String, channel: String?,
-                          language: YouTubeSettings.SummaryLanguage, summaryLength: YouTubeSettings.SummaryLength,
+                          language: YouTubeSettings.SummaryLanguage, summaryLength: SummaryLength,
                           connection: LLMConnection) async throws -> VideoSummary {
         var details = "Title: \(title)\n"
         if let channel, !channel.isEmpty { details += "Channel: \(channel)\n" }
@@ -75,7 +75,7 @@ enum LLMSummarizer {
     }
 
     private static func instructions(language: YouTubeSettings.SummaryLanguage,
-                                     summaryLength: YouTubeSettings.SummaryLength) -> String {
+                                     summaryLength: SummaryLength) -> String {
         let target: String
         switch language {
         case .video: target = "the same language as the transcript"

@@ -38,8 +38,8 @@ como Markdown, leerlos con varios estilos, resaltarlos y consultar el diccionari
   Cloudflare and others) write a *Main takeaways* summary. The video is saved as an
   article in the list: its thumbnail, channel, length and the first lines of the
   summary show in the list, and the article holds the summary. When you paste a
-  YouTube link you choose its size (short, medium by default, or long). The
-  transcript is not saved. See [YouTube summaries](#youtube-summaries).
+  YouTube link, or share it with *Leonera Paper*, you choose its size (short, medium
+  by default, or long). The transcript is not saved. See [YouTube summaries](#youtube-summaries).
 - **Almacenamiento local** en *Archivos › En mi iPhone › Leonera Paper*: una carpeta
   por artículo con `<artículo>.md` (con *front matter* YAML), `images/` y, si viene
   de un PDF, `<artículo>.pdf`.
@@ -136,9 +136,9 @@ How an import works (`App/YouTube/`):
    (`verbose_json`, for the segment times).
 5. `LLMSummarizer` sends the transcript to the chat completions endpoint of the chosen
    provider and asks for an overview sentence followed by a numbered `## Main takeaways`
-   list. The size chosen in *Añadir artículo* sets the number of takeaways: short 3–5
-   with one sentence each, medium 5–10 with one to three sentences, long 10–15 with
-   three to five. `LLMProvider` holds each provider's base URL and default model.
+   list. The size chosen in *Añadir artículo* or in the share extension sets the
+   number of takeaways: short 3–5 with one sentence each, medium 5–10 with one to
+   three sentences, long 10–15 with three to five. `LLMProvider` holds each provider's base URL and default model.
 6. `YouTubeImporter` writes the Markdown file: front matter, title, channel, link and
    length, thumbnail and summary. The transcript is not written to the article.
 
@@ -156,7 +156,7 @@ transcribing again, and keeps the size chosen for the link.
 | `App/Markdown/` | Intérprete de Markdown con mapa de posiciones (para escribir `==…==` en el sitio exacto). |
 | `App/YouTube/` | YouTube summaries: audio download, conversion, Whisper transcription (Groq) and summary (any OpenAI-compatible provider). |
 | `ShareExtension/` | Extensión «Compartir» de Safari. |
-| `Shared/` | Código común: cola de enlaces pendientes en un grupo de llavero. |
+| `Shared/` | Código común: cola de enlaces pendientes en un grupo de llavero, enlaces de YouTube y tamaño del resumen. |
 | `Config/` | `Info.plist` y entitlements. |
 | `scripts/` | Validación de App Store Connect, verificación del IPA y publicación en Pages. |
 
@@ -164,6 +164,11 @@ La extensión no usa App Groups: deja la URL en un grupo de llavero compartido
 (`keychain-access-groups`, que no requiere registrar nada en el portal) y abre la
 app con `leonerapaper://import?url=…`; si no consigue abrirla, la app importa los
 enlaces pendientes la próxima vez que se abre.
+
+When the shared link is a YouTube video, the extension first asks for the size of the
+summary (*Corto*, *Mediano* or *Largo*; *Cancelar* saves nothing). The size goes with
+the link in the queue and as `&summary=short|medium|long` in the `import` link. Other
+links are saved without asking, because they are not summarized.
 
 ## Desarrollo local
 
