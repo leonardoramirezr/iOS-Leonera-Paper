@@ -1,0 +1,18 @@
+{
+  "tag": "build-32-e4ed924",
+  "version": "0.13.32",
+  "build": "32",
+  "channel": "prerelease",
+  "branch": "youtube-model-discovery",
+  "sha": "e4ed924bc26320f247dddaf9b5d12a9e416cad35",
+  "commit_title": "YouTube: descubrir los modelos de cada proveedor de voz y de LLM",
+  "created": "2026-10-23T18:22:29Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/40002310209",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-32-e4ed924/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-32-e4ed924/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-32-e4ed924%2Fmanifest.plist"
+}

@@ -1,0 +1,17 @@
+{
+  "tag": "build-20-269cc61",
+  "version": "0.7.20",
+  "build": "20",
+  "channel": "prerelease",
+  "branch": "claude/opciones-icono",
+  "sha": "269cc61ccd62b472f3f185d8900ded1ce3f05480",
+  "created": "2026-10-22T17:33:25Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/39823493354",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-20-269cc61/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-20-269cc61/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-20-269cc61%2Fmanifest.plist"
+}

@@ -1,0 +1,18 @@
+{
+  "tag": "build-40-9e02eef",
+  "version": "0.16.40",
+  "build": "40",
+  "channel": "prerelease",
+  "branch": "claude/lucid-ptolemy-ht1uy2",
+  "sha": "9e02eef62efb99f526e3095f6d66bcf4a67370d7",
+  "commit_title": "Commit vacío",
+  "created": "2026-11-07T03:44:47Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/42335268855",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-40-9e02eef/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-40-9e02eef/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-40-9e02eef%2Fmanifest.plist"
+}

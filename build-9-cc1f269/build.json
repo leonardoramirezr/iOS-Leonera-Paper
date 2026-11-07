@@ -1,0 +1,17 @@
+{
+  "tag": "build-9-cc1f269",
+  "version": "0.3.9",
+  "build": "9",
+  "channel": "prerelease",
+  "branch": "claude/leonora-word-selection-ui-0nykms",
+  "sha": "cc1f269f56413d3d8e7247b7a8632cae0c73c839",
+  "created": "2026-10-21T23:16:40Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/39692202162",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-9-cc1f269/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-9-cc1f269/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-9-cc1f269%2Fmanifest.plist"
+}

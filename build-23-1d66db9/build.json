@@ -1,0 +1,18 @@
+{
+  "tag": "build-23-1d66db9",
+  "version": "0.8.23",
+  "build": "23",
+  "channel": "prerelease",
+  "branch": "claude/great-gates-24rovz",
+  "sha": "1d66db90ae6f45ecc389daa9101f2ff97d5b806c",
+  "commit_title": "Ajustes: mostrar el nombre del build en «Acerca de»",
+  "created": "2026-10-22T17:56:36Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/39826738632",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-23-1d66db9/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-23-1d66db9/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-23-1d66db9%2Fmanifest.plist"
+}

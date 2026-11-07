@@ -1,0 +1,18 @@
+{
+  "tag": "build-28-b24d6e4",
+  "version": "0.11.28",
+  "build": "28",
+  "channel": "prerelease",
+  "branch": "claude/youtube-summaries",
+  "sha": "b24d6e44dd5a83665c82c90e8dd9adcba834c7c0",
+  "commit_title": "YouTube: guardar vídeos como resumen «Main takeaways» (Whisper en Groq + Gemini)",
+  "created": "2026-10-22T23:51:13Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/39874206124",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-28-b24d6e4/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-28-b24d6e4/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-28-b24d6e4%2Fmanifest.plist"
+}

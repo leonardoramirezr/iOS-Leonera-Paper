@@ -1,0 +1,18 @@
+{
+  "tag": "build-18-eead619",
+  "version": "0.6.18",
+  "build": "18",
+  "channel": "prerelease",
+  "branch": "claude/github-pages-commit-title-2wijlc",
+  "sha": "eead6197f1824d3abdae47bf2c4d875521ff8cd2",
+  "commit_title": "Pages: mostrar el título del commit en cada build",
+  "created": "2026-10-22T13:39:29Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/39788531580",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-18-eead619/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-18-eead619/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-18-eead619%2Fmanifest.plist"
+}

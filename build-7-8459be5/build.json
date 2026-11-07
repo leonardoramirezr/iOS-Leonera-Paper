@@ -1,0 +1,17 @@
+{
+  "tag": "build-7-8459be5",
+  "version": "0.2.7",
+  "build": "7",
+  "channel": "prerelease",
+  "branch": "claude/eager-bardeen-vu22j9",
+  "sha": "8459be5b48426de7f52ffed9b0630f28c34985a8",
+  "created": "2026-10-14T15:55:44Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/38593354229",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-7-8459be5/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-7-8459be5/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-7-8459be5%2Fmanifest.plist"
+}

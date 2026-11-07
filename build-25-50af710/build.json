@@ -1,0 +1,18 @@
+{
+  "tag": "build-25-50af710",
+  "version": "0.9.25",
+  "build": "25",
+  "channel": "prerelease",
+  "branch": "claude/exciting-allen-4qbw3d",
+  "sha": "50af710cbb5d28e454645e8f4bbce6a68896c84c",
+  "commit_title": "Pages: mostrar el título del commit también en builds antiguos",
+  "created": "2026-10-22T18:00:27Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/39827092492",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-25-50af710/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-25-50af710/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-25-50af710%2Fmanifest.plist"
+}

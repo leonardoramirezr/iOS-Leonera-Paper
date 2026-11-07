@@ -1,0 +1,18 @@
+{
+  "tag": "build-22-890e371",
+  "version": "0.8.22",
+  "build": "22",
+  "channel": "prerelease",
+  "branch": "claude/article-title-change-3abfso",
+  "sha": "890e37112cbb13cb804cbba343be8caa7cebb6b4",
+  "commit_title": "Biblioteca: permitir cambiar el título de un artículo",
+  "created": "2026-10-22T17:54:31Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/39826383992",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-22-890e371/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-22-890e371/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-22-890e371%2Fmanifest.plist"
+}

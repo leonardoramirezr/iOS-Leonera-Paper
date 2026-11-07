@@ -1,0 +1,17 @@
+{
+  "tag": "build-17-aafc215",
+  "version": "0.6.17",
+  "build": "17",
+  "channel": "prerelease",
+  "branch": "claude/opciones-icono",
+  "sha": "aafc215a023bc401ddff0c45336f2775e0a58dcc",
+  "created": "2026-10-22T05:33:53Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/39728613527",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-17-aafc215/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-17-aafc215/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-17-aafc215%2Fmanifest.plist"
+}

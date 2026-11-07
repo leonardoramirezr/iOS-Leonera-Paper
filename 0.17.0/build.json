@@ -1,0 +1,18 @@
+{
+  "tag": "0.17.0",
+  "version": "0.17.0",
+  "build": "41",
+  "channel": "stable",
+  "branch": "main",
+  "sha": "89ed4a97a01fb72a07c5ee1084150770e3724288",
+  "commit_title": "Compartir: preguntar el tamaño del resumen de los vídeos de YouTube (#17)",
+  "created": "2026-11-07T03:59:17Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/42336295377",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/0.17.0/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/0.17.0/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2F0.17.0%2Fmanifest.plist"
+}

@@ -1,0 +1,18 @@
+{
+  "tag": "build-35-cc6be21",
+  "version": "0.14.35",
+  "build": "35",
+  "channel": "prerelease",
+  "branch": "claude/youtube-summary-size-option-us6ipy",
+  "sha": "cc6be2175ef50315d5d04b59db44065124454ecb",
+  "commit_title": "YouTube: el tamaño de resumen por defecto es Mediano",
+  "created": "2026-10-23T20:43:11Z",
+  "app_name": "Leonera Paper",
+  "bundle_id": "com.leonardoramirezr.leonerapaper",
+  "ipa": "LeoneraPaper.ipa",
+  "repo": "leonardoramirezr/iOS-Leonera-Paper",
+  "run_url": "https://github.com/leonardoramirezr/iOS-Leonera-Paper/actions/runs/40021134264",
+  "page_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-35-cc6be21/",
+  "manifest_url": "https://leonardoramirezr.github.io/iOS-Leonera-Paper/build-35-cc6be21/manifest.plist",
+  "install_url": "itms-services://?action=download-manifest&url=https%3A%2F%2Fleonardoramirezr.github.io%2FiOS-Leonera-Paper%2Fbuild-35-cc6be21%2Fmanifest.plist"
+}
