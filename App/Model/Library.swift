@@ -12,7 +12,7 @@ final class Library {
         var status: String
         var error: String?
         /// Size of the summary when the link is a YouTube video.
-        var summaryLength = YouTubeSettings.SummaryLength.medium
+        var summaryLength = SummaryLength.medium
 
         var displayName: String {
             if YouTubeLink.isVideo(url) { return "Vídeo de YouTube" }
@@ -66,7 +66,7 @@ final class Library {
             // PDF abierto desde Archivos, Mail, etc. («Abrir en Leonera Paper»).
             importPDF(at: url)
         } else if let target = AppLinks.articleURL(from: url) {
-            importArticle(from: target)
+            importArticle(from: target, summaryLength: AppLinks.summaryLength(from: url) ?? .medium)
         }
         drainSharedQueue()
     }
@@ -87,13 +87,13 @@ final class Library {
 
     func drainSharedQueue() {
         for item in SharedQueue.drain() {
-            importArticle(from: item.url)
+            importArticle(from: item.url, summaryLength: item.summaryLength ?? .medium)
         }
     }
 
     // MARK: - Importación
 
-    func importArticle(from url: URL, summaryLength: YouTubeSettings.SummaryLength = .medium) {
+    func importArticle(from url: URL, summaryLength: SummaryLength = .medium) {
         let url = YouTubeLink.canonicalURL(for: url) ?? url
         guard !jobs.contains(where: { $0.url == url && $0.error == nil }) else { return }
         if !url.isFileURL, let existing = articles.first(where: { $0.sourceURL == url }) {
@@ -117,7 +117,7 @@ final class Library {
         YouTubeImporter.discardWorkFiles(for: job.url)
     }
 
-    private func runImport(jobID: UUID, url: URL, summaryLength: YouTubeSettings.SummaryLength) async {
+    private func runImport(jobID: UUID, url: URL, summaryLength: SummaryLength) async {
         let update: @MainActor (String) -> Void = { [weak self] status in
             guard let self, let index = self.jobs.firstIndex(where: { $0.id == jobID }) else { return }
             self.jobs[index].status = status

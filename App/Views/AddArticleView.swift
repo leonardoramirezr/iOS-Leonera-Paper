@@ -8,7 +8,7 @@ struct AddArticleView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var text = ""
     @State private var showsPDFPicker = false
-    @State private var summaryLength = YouTubeSettings.SummaryLength.medium
+    @State private var summaryLength = SummaryLength.medium
     @FocusState private var focused: Bool
 
     var body: some View {
@@ -42,7 +42,7 @@ struct AddArticleView: View {
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
                             Picker("Tamaño del resumen", selection: $summaryLength) {
-                                ForEach(YouTubeSettings.SummaryLength.allCases) { length in
+                                ForEach(SummaryLength.allCases) { length in
                                     Text(length.title).tag(length)
                                 }
                             }

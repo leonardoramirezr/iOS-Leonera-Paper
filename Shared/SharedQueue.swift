@@ -12,6 +12,9 @@ enum SharedQueue {
         var url: URL
         var title: String?
         var date: Date
+        /// Size of the summary chosen in the share extension when the link is a YouTube video.
+        /// Nil for other links and for items queued by older versions.
+        var summaryLength: SummaryLength?
     }
 
     private static let service = "leonerapaper.pending-articles"
@@ -37,8 +40,9 @@ enum SharedQueue {
     }
 
     @discardableResult
-    static func enqueue(url: URL, title: String?) -> Bool {
-        guard let data = try? JSONEncoder().encode(Item(url: url, title: title, date: Date())) else { return false }
+    static func enqueue(url: URL, title: String?, summaryLength: SummaryLength? = nil) -> Bool {
+        let item = Item(url: url, title: title, date: Date(), summaryLength: summaryLength)
+        guard let data = try? JSONEncoder().encode(item) else { return false }
         var query = baseQuery()
         query[kSecAttrAccount as String] = UUID().uuidString
         query[kSecValueData as String] = data
@@ -83,11 +87,15 @@ enum AppLinks {
         (Bundle.main.object(forInfoDictionaryKey: "LPURLScheme") as? String) ?? "leonerapaper"
     }
 
-    static func importURL(for url: URL) -> URL? {
+    /// `leonerapaper://import?url=…`, with `&summary=<size>` when a summary size was chosen.
+    static func importURL(for url: URL, summaryLength: SummaryLength? = nil) -> URL? {
         var components = URLComponents()
         components.scheme = scheme
         components.host = "import"
         components.queryItems = [URLQueryItem(name: "url", value: url.absoluteString)]
+        if let summaryLength {
+            components.queryItems?.append(URLQueryItem(name: "summary", value: summaryLength.rawValue))
+        }
         return components.url
     }
 
@@ -99,5 +107,12 @@ enum AppLinks {
               let target = URL(string: value), let scheme = target.scheme?.lowercased(),
               scheme == "http" || scheme == "https" else { return nil }
         return target
+    }
+
+    /// The summary size in `leonerapaper://import?url=…&summary=<size>`, nil when it is missing.
+    static func summaryLength(from url: URL) -> SummaryLength? {
+        guard url.scheme?.lowercased() == scheme else { return nil }
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        return components?.queryItems?.first(where: { $0.name == "summary" })?.value.flatMap(SummaryLength.init(rawValue:))
     }
 }
